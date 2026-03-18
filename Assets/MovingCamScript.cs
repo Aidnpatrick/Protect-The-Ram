@@ -27,10 +27,11 @@ public class MovingCamScript : MonoBehaviour
             if (Keyboard.current.aKey.isPressed) moveInput.x -= 1;
             if (Keyboard.current.dKey.isPressed) moveInput.x += 1;           
         }
+        /*
         if(Input.anyKeyDown)
         {
             cameraScript.isInformationBoxActive = false;
-        }
+        }*/
         moveInput = moveInput.normalized;
     }
 
