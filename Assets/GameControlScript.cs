@@ -35,7 +35,7 @@ public class GameControlScript : MonoBehaviour
             GameObject selectionContainerClone = Instantiate(selectionContainerPrefab, selectionContainer.transform);
             selectionContainerClone.transform.GetChild(0).GetComponent<TMP_Text>().text = turretsIndex.name;
             int temp = turretsIndex.id;
-            selectionContainerClone.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => currentSelectionId = temp);
+            selectionContainerClone.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => currentSelectionId = temp);
 
         }
     }
