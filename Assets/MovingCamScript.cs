@@ -14,7 +14,6 @@ public class MovingCamScript : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        Debug.Log("PlayerScript started");
     }
 
     void Update()
@@ -27,11 +26,13 @@ public class MovingCamScript : MonoBehaviour
             if (Keyboard.current.aKey.isPressed) moveInput.x -= 1;
             if (Keyboard.current.dKey.isPressed) moveInput.x += 1;           
         }
-        /*
-        if(Input.anyKeyDown)
-        {
+
+        if (Input.anyKeyDown &&
+        !Input.GetMouseButtonDown(0) &&
+        !Input.GetMouseButtonDown(1) &&
+        !Input.GetMouseButtonDown(2))
             cameraScript.isInformationBoxActive = false;
-        }*/
+
         moveInput = moveInput.normalized;
     }
 
