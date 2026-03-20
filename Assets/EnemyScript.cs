@@ -14,7 +14,8 @@ public class EnemyScript : MonoBehaviour
     }
     void Update()
     {
-        GameObject target = gameControlScript.FindNearestObject(gameControlScript.turrets, Mathf.Infinity);
+        GameObject target = gameControlScript.FindNearestObject(gameControlScript.turrets, Mathf.Infinity, gameObject);
+        
         if(target == null) {}
         else
             MoveTowards(target.transform.position);

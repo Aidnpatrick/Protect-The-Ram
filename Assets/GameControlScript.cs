@@ -73,7 +73,7 @@ public class GameControlScript : MonoBehaviour
     // Update is called once per frame
 
 
-    public GameObject FindNearestObject(GameObject[] targets, float lineOfSight)
+    public GameObject FindNearestObject(GameObject[] targets, float lineOfSight, GameObject origin)
     {
         float closestDistance = Mathf.Infinity;
         if (targets.Length == 0)
@@ -81,7 +81,7 @@ public class GameControlScript : MonoBehaviour
         GameObject closestEnemy = targets[0];
         foreach(GameObject enemy in targets)
         {
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            float distance = Vector3.Distance(origin.transform.position, enemy.transform.position);
             if(distance < closestDistance && distance < lineOfSight)
             {
                 closestEnemy = enemy;
