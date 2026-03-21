@@ -13,6 +13,7 @@ public class CameraScript : MonoBehaviour
     public GameObject informationBox;
     public bool isInformationBoxActive = false;
     private Vector2 moveInput;
+    public Collider2D hitMain = null;
 
     //prefabs
     public GameObject buildingPrefab;
@@ -47,9 +48,11 @@ public class CameraScript : MonoBehaviour
             "\nInformation: " + building.information;
     }
 
-    void OpenInformationBox(Collider2D targetHit)
+    void OpenInformationBox(GameObject targetHit)
     {
+
         RectTransform canvasRect = informationBox.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+
 
         Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -59,21 +62,51 @@ public class CameraScript : MonoBehaviour
             out pos
         );
         TMP_Text informationText = informationBox.transform.GetChild(0).GetComponent<TMP_Text>();
+        Button informationButton = informationBox.transform.GetChild(1).GetComponent<Button>();
+        Button informationDestroyButton = informationBox.transform.GetChild(2).GetComponent<Button>();
         if(targetHit.transform.parent != null)
         {
+            hitMain = targetHit.GetComponent<Collider2D>();
+            //informationDestroyButton.gameObject.SetActive(true);
+
             informationText.text = targetHit.name;
+            if(targetHit.name.Contains("Camp"))
+                informationButton.gameObject.SetActive(true);
+            else
+                informationButton.gameObject.SetActive(false);
         }
         else
         {
+
             if(targetHit.transform.childCount > 0)
+            {
+
+                hitMain = targetHit.transform.GetChild(0).GetComponent<Collider2D>();
                 informationText.text = targetHit.transform.GetChild(0).name;
+                if(targetHit.transform.GetChild(0).name.Contains("Camp"))
+                    informationButton.gameObject.SetActive(true);
+                else
+                    informationButton.gameObject.SetActive(false);
+            }
             else
+            {
                 informationText.text = "Empty";
+                informationButton.gameObject.SetActive(false);
+            }
         }
         informationBox.GetComponent<RectTransform>().anchoredPosition = pos + new Vector2(200, 100);
 
         isInformationBoxActive = !isInformationBoxActive;
 
+    }
+    public void MakeMoreTroops()
+    {
+        BuildingScript bs = hitMain.GetComponent<BuildingScript>();
+        bs.numOfTroops = Mathf.Clamp(bs.numOfTroops+1,0,5);
+    }
+    public void DestroyBuilding()
+    {
+        Destroy(hitMain.gameObject);
     }
     void Update()
     {
@@ -89,7 +122,7 @@ public class CameraScript : MonoBehaviour
                 gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera) && Input.GetMouseButtonDown(1))
             {
                 UpdateInformationBoxSelection(gameDataBaseScript.buildings[index], selectionContainerIndex.GetComponent<RectTransform>().anchoredPosition);
-                
+
                 isInformationBoxActive = !isInformationBoxActive;
                 return;
             }
@@ -100,7 +133,6 @@ public class CameraScript : MonoBehaviour
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos);
-
         informationBox.SetActive(isInformationBoxActive);
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame)
         {
@@ -109,9 +141,9 @@ public class CameraScript : MonoBehaviour
             return;
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && hit.transform.parent != null)
         {
-            OpenInformationBox(hit);
+            OpenInformationBox(hit.gameObject);
             return;
         }
 
@@ -119,11 +151,11 @@ public class CameraScript : MonoBehaviour
         
         if (Input.GetMouseButtonDown(1))
         {
-            OpenInformationBox(hit);
+            OpenInformationBox(hit.gameObject);
             return;
         }
 
-        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1)
+        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive)
         {
             BuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
         }

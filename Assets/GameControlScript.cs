@@ -12,7 +12,7 @@ public class GameControlScript : MonoBehaviour
     //prefab
     public GameObject selectionContainerPrefab;
     //libraries
-    public GameObject[] enemies, turrets;
+    public GameObject[] enemies, turrets, troops;
     
     public int currentSelectionId = 0;
 
@@ -24,7 +24,7 @@ public class GameControlScript : MonoBehaviour
             SpawnEnemy(new Vector3(Random.Range(1,11), Random.Range(1,11), 1));
         }
         currentSelectionId = -1;
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 50; i++)
         {
             for(int j = 0; j < 10; j++)
             {
@@ -43,6 +43,7 @@ public class GameControlScript : MonoBehaviour
         Keyboard keyboard = Keyboard.current;
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         turrets = GameObject.FindGameObjectsWithTag("Buildings");
+        troops = GameObject.FindGameObjectsWithTag("Troop");
         if(keyboard.jKey.wasPressedThisFrame)
         {
             SpawnEnemy(new Vector3(Random.Range(1,11), Random.Range(1,11), 1));

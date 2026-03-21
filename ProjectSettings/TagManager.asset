@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Buildings
+  - Troop
   layers:
   - Default
   - TransparentFX

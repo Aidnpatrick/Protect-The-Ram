@@ -1,3 +1,4 @@
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -6,6 +7,7 @@ public class EnemyScript : MonoBehaviour
     public GameDataBaseScript gameDataBaseScript;
     public float[] weights = {0,0};
     public float health = 100, speed = 1.2f;
+    public float hitCooldown = 0;
     void Start()
     {
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
@@ -14,13 +16,36 @@ public class EnemyScript : MonoBehaviour
     }
     void Update()
     {
-        GameObject target = gameControlScript.FindNearestObject(gameControlScript.turrets, Mathf.Infinity, gameObject);
-        
-        if(target == null) {}
-        else
+        hitCooldown -= Time.deltaTime;
+
+        GameObject target = null;
+
+        if (name.Contains("Enemy"))
+        {
+            GameObject closestTroop = gameControlScript.FindNearestObject(gameControlScript.troops, Mathf.Infinity, gameObject);
+            GameObject closestTurret = gameControlScript.FindNearestObject(gameControlScript.turrets, Mathf.Infinity, gameObject);
+
+            if (closestTroop == null && closestTurret == null)
+                target = null;
+            else if (closestTroop == null)
+                target = closestTurret;
+            else if (closestTurret == null)
+                target = closestTroop;
+            else
+            {
+                float troopDist = Vector3.Distance(closestTroop.transform.position, transform.position);
+                float turretDist = Vector3.Distance(closestTurret.transform.position, transform.position);
+                target = troopDist < turretDist ? closestTroop : closestTurret;
+            }
+        }
+        else if (name.Contains("Troop"))
+            target = gameControlScript.FindNearestObject(gameControlScript.enemies, 20, gameObject);
+
+        if (target != null)
             MoveTowards(target.transform.position);
-        
-        if(health <= 0) Destroy(gameObject);
+
+        if (health <= 0)
+            Destroy(gameObject);
     }
 
     public void MoveTowards(Vector3 targetPosition)
@@ -47,7 +72,7 @@ public class EnemyScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.name.Contains("Bullet"))
+        if(collision.name.Contains("Bullet") && name.Contains("Enemy"))
         {
             Destroy(collision.gameObject);
             foreach(Building currentBuilding in gameDataBaseScript.buildings)
@@ -58,6 +83,15 @@ public class EnemyScript : MonoBehaviour
                     return;
                 }
             }        
+        }
+        if(collision.name.Contains("Enemy") && name.Contains("Troop"))
+        {
+            health -= 10;
+            hitCooldown = 1;
+        }
+        if(collision.name.Contains("Troop") && name.Contains("Enemy")) {
+            health -= 10;
+            hitCooldown = 1;
         }
     }
 }
