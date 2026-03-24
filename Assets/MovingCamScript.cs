@@ -18,6 +18,7 @@ public class MovingCamScript : MonoBehaviour
 
     void Update()
     {
+        Keyboard keyboard = Keyboard.current;
         moveInput = Vector2.zero;
         if (canMove)
         {
@@ -34,6 +35,11 @@ public class MovingCamScript : MonoBehaviour
             cameraScript.isInformationBoxActive = false;
 
         moveInput = moveInput.normalized;
+        
+        if(keyboard.shiftKey.isPressed)
+            moveSpeed = 15f;
+        else
+            moveSpeed = 5f;
     }
 
     [System.Obsolete]

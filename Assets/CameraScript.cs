@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using Unity.VisualScripting;
 
 public class CameraScript : MonoBehaviour
 {
@@ -67,9 +66,11 @@ public class CameraScript : MonoBehaviour
         if(targetHit.transform.parent != null)
         {
             hitMain = targetHit.GetComponent<Collider2D>();
-            //informationDestroyButton.gameObject.SetActive(true);
+            informationDestroyButton.gameObject.SetActive(true);
 
             informationText.text = targetHit.name;
+            informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().health + " HP\n";
+
             if(targetHit.name.Contains("Camp"))
                 informationButton.gameObject.SetActive(true);
             else
@@ -81,8 +82,10 @@ public class CameraScript : MonoBehaviour
             if(targetHit.transform.childCount > 0)
             {
 
+                informationDestroyButton.gameObject.SetActive(true);    
                 hitMain = targetHit.transform.GetChild(0).GetComponent<Collider2D>();
                 informationText.text = targetHit.transform.GetChild(0).name;
+                informationText.text += "\n" + targetHit.transform.GetChild(0).GetComponent<BuildingScript>().health + " HP\n";
                 if(targetHit.transform.GetChild(0).name.Contains("Camp"))
                     informationButton.gameObject.SetActive(true);
                 else
@@ -91,6 +94,7 @@ public class CameraScript : MonoBehaviour
             else
             {
                 informationText.text = "Empty";
+                informationDestroyButton.gameObject.SetActive(true);
                 informationButton.gameObject.SetActive(false);
             }
         }
@@ -104,6 +108,7 @@ public class CameraScript : MonoBehaviour
         BuildingScript bs = hitMain.GetComponent<BuildingScript>();
         bs.numOfTroops = Mathf.Clamp(bs.numOfTroops+1,0,5);
     }
+    
     public void DestroyBuilding()
     {
         Destroy(hitMain.gameObject);
@@ -136,7 +141,6 @@ public class CameraScript : MonoBehaviour
         informationBox.SetActive(isInformationBoxActive);
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame)
         {
-
             Destroy(hit.gameObject);
             return;
         }
@@ -156,9 +160,7 @@ public class CameraScript : MonoBehaviour
         }
 
         if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive)
-        {
             BuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
-        }
 
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame)
@@ -173,5 +175,13 @@ public class CameraScript : MonoBehaviour
         buildingClone.name = targetBuilding.name;
         buildingClone.transform.parent = targetTile.transform;
         buildingClone.GetComponent<BuildingScript>().building = new Building(targetBuilding);
+    }
+
+    public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
+    {
+        GameObject targetTile = gameControlScript.FindTile(tileId);
+        GameObject targetChild = Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
+        Debug.Log(targetTile + " " + targetChild);
+        return targetChild;
     }
 }

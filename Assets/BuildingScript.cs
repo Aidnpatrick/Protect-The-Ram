@@ -13,18 +13,23 @@ public class BuildingScript : MonoBehaviour
     public int typeOfBuilding = 0;
 
     public bool isReloading = false;
-
+    public float health;
     void Start()
     {
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
+        if(building == null)
+            return;
 
+            
         shotCooldown = building.fireRate;
         ammo = building.ammo;
+        health = building.health;
 
         if(building.name.Contains("Turret"))
             typeOfBuilding = 0;
         if(building.name.Contains("Camp")) 
             typeOfBuilding = 1;
+
     }
 
     void Update()
@@ -43,6 +48,8 @@ public class BuildingScript : MonoBehaviour
                 shotCooldown = building.fireRate;
             }
         }
+        if(health <= 0)
+            Destroy(gameObject);
     }
 
     void HandleShooting()
@@ -75,7 +82,7 @@ public class BuildingScript : MonoBehaviour
     void StartReload()
     {
         isReloading = true;
-        reloadingCooldown = building.ammo * building.fireRate; 
+        reloadingCooldown = building.reload;
     }
 
     void Shoot()
@@ -115,6 +122,7 @@ public class BuildingScript : MonoBehaviour
     void SpawnTroop()
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);
+        troopClone.transform.position += new Vector3(-1f,0,0);
         troopClone.GetComponent<SpriteRenderer>().color = Color.darkGreen;
         troopClone.tag = "Troop";
         troopClone.name = "Troop";

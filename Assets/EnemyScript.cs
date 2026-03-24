@@ -1,17 +1,21 @@
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public GameDataBaseScript gameDataBaseScript;
+    private NavMeshAgent agent;
     public float[] weights = {0,0};
     public float health = 100, speed = 1.2f;
     public float hitCooldown = 0;
+    public GameObject targetMain;
     void Start()
     {
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
+        agent = GetComponent<NavMeshAgent>();
         health = 100;
     }
     void Update()
@@ -22,11 +26,13 @@ public class EnemyScript : MonoBehaviour
 
         if (name.Contains("Enemy"))
         {
-            GameObject closestTroop = gameControlScript.FindNearestObject(gameControlScript.troops, Mathf.Infinity, gameObject);
-            GameObject closestTurret = gameControlScript.FindNearestObject(gameControlScript.turrets, Mathf.Infinity, gameObject);
+            GameObject closestTroop = gameControlScript.FindNearestObject(gameControlScript.troops, 30, gameObject);
+            GameObject closestTurret = gameControlScript.FindNearestObject(gameControlScript.turrets, 30, gameObject);
+            GameObject ram = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
+
 
             if (closestTroop == null && closestTurret == null)
-                target = null;
+                target = ram;
             else if (closestTroop == null)
                 target = closestTurret;
             else if (closestTurret == null)
@@ -39,15 +45,24 @@ public class EnemyScript : MonoBehaviour
             }
         }
         else if (name.Contains("Troop"))
-            target = gameControlScript.FindNearestObject(gameControlScript.enemies, 20, gameObject);
+            target = gameControlScript.FindNearestObject(gameControlScript.enemies, 10, gameObject);
 
         if (target != null)
+        {
+            //agent.SetDestination(target.transform.position);
+        
             MoveTowards(target.transform.position);
+        }
 
-        if (health <= 0)
-            Destroy(gameObject);
+        if(name.Contains("Builder"))
+        {
+            
+        }
+
+
+        targetMain = target;
     }
-
+    
     public void MoveTowards(Vector3 targetPosition)
     {
         //Vector2 direction = (player.transform.position - transform.position);
@@ -69,6 +84,7 @@ public class EnemyScript : MonoBehaviour
         rb.MoveRotation(angle);
         rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
     }
+    
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -79,19 +95,43 @@ public class EnemyScript : MonoBehaviour
             {
                 if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "")))
                 {
-                    health -= currentBuilding.damage;
+                    
+
+                    health -= currentBuilding.damage / 2;
+                    if (health <= 0)
+                    {
+                        gameControlScript.money += 2;
+                        Destroy(gameObject);
+                    }
                     return;
                 }
             }        
         }
+
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
         if(collision.name.Contains("Enemy") && name.Contains("Troop"))
         {
             health -= 10;
             hitCooldown = 1;
         }
-        if(collision.name.Contains("Troop") && name.Contains("Enemy")) {
+        if(collision.name.Contains("Troop") && name.Contains("Enemy")&& hitCooldown <= 0) {
             health -= 10;
             hitCooldown = 1;
+            if (health <= 0)
+            {
+                gameControlScript.money += 2;
+                Destroy(gameObject);
+            }
         }
+
+        if(collision.name.Contains("Turret") && name.Contains("Enemy")&& hitCooldown <= 0)
+        {
+            collision.GetComponent<BuildingScript>().health -= 10;
+            hitCooldown = 1;
+        }
+        if(collision.name.Contains("Ram"))
+            gameControlScript.ramTracking[collision.gameObject] -= 10;
     }
 }

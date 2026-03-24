@@ -17,8 +17,9 @@ public class Building
     public float range = 0;
     public float recoil = 0;
     public int ammo = 0;
+    public float reload = 0;
     public static List<Building> buildingCurrent = new List<Building>();
-    public Building(string n, float f, float d, string i, int id, string image, int c, int h, float r, float recoil, int a)
+    public Building(string n, float f, float d, string i, int id, string image, int c, int h, float r, float recoil, int a, float reload)
     {
         buildingCurrent.Add(this);
         name = n;
@@ -32,11 +33,13 @@ public class Building
         range = r;
         this.recoil = recoil;
         ammo = a;
+        this.reload = reload;
     }
 
     public Building(Building other)
     {
         buildingCurrent.Add(this);
+        
         name = other.name;
         fireRate = other.fireRate;
         damage = other.damage;
@@ -48,6 +51,10 @@ public class Building
         range = other.range;
         recoil = other.recoil;
         ammo = other.ammo;
+        reload = other.reload;
+    }
+    public Building() {
+        
     }
 };
 
@@ -60,10 +67,10 @@ public class GameDataBaseScript : MonoBehaviour
     {
         Building.buildingCurrent.Clear(); // prevent duplicates
         
-        new Building("BasicTurret",1,25,"Versatile, fit for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 50, 300, 15, 8, 10);
-        new Building("HeavyTurret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 120, 450, 30, 2, 3);
-        new Building("MachineTurret", 0.1f, 10, "Has a fast fire-rate. Shoots small ammo.", 2, "MachineTUrret", 160, 350, 10, 13, 50);
-        new Building("ArmyCamp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 300, 450, 0, 0, 0);
+        new Building("BasicTurret",1,25,"Versatile, fit for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 150, 200, 15, 8, 10, 4.5f);
+        new Building("HeavyTurret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 200, 300, 30, 2, 3, 8);
+        new Building("MachineTurret", 0.1f, 10, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 130, 250, 10, 13, 50, 7.5f);
+        new Building("ArmyCamp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 300, 450, 0, 0, 0,0);
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
 
@@ -88,4 +95,5 @@ public class GameDataBaseScript : MonoBehaviour
             if(building.id == targetId) return building;
         return null;
     }
+    
 }
