@@ -20,6 +20,11 @@ public class BuildingScript : MonoBehaviour
         if(building == null)
             return;
 
+        Debug.Log("Images/" + name.Replace("(Clone)", ""));
+        if(Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", "")) != null) {
+            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", ""));
+        }
+
             
         shotCooldown = building.fireRate;
         ammo = building.ammo;
@@ -95,6 +100,7 @@ public class BuildingScript : MonoBehaviour
 
         if(target == null) return;
 
+
         GameObject bulletClone = Instantiate(
             bulletPrefab,
             transform.position,
@@ -122,7 +128,7 @@ public class BuildingScript : MonoBehaviour
     void SpawnTroop()
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);
-        troopClone.transform.position += new Vector3(-1f,0,0);
+        troopClone.transform.position += new Vector3(-Random.Range(0.5f, 1f),0,0);
         troopClone.GetComponent<SpriteRenderer>().color = Color.darkGreen;
         troopClone.tag = "Troop";
         troopClone.name = "Troop";

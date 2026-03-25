@@ -14,6 +14,7 @@ public class MovingCamScript : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        transform.position = new Vector3(37, 2.85f, 0);
     }
 
     void Update()
@@ -22,8 +23,8 @@ public class MovingCamScript : MonoBehaviour
         moveInput = Vector2.zero;
         if (canMove)
         {
-            if (Keyboard.current.wKey.isPressed) moveInput.y += 1;
-            if (Keyboard.current.sKey.isPressed) moveInput.y -= 1;
+            //if (Keyboard.current.wKey.isPressed) moveInput.y += 1;
+            //if (Keyboard.current.sKey.isPressed) moveInput.y -= 1;
             if (Keyboard.current.aKey.isPressed) moveInput.x -= 1;
             if (Keyboard.current.dKey.isPressed) moveInput.x += 1;           
         }

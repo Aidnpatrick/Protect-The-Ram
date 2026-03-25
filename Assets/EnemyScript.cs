@@ -15,8 +15,8 @@ public class EnemyScript : MonoBehaviour
     {
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
-        agent = GetComponent<NavMeshAgent>();
         health = 100;
+        MoveTowards(transform.position - new Vector3(-Random.Range(0.5f, 1f),0,0));
     }
     void Update()
     {
