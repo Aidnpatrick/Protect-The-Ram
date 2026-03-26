@@ -68,8 +68,8 @@ public class GameDataBaseScript : MonoBehaviour
         Building.buildingCurrent.Clear(); // prevent duplicates
         
         new Building("BasicTurret",1,25,"Versatile, fit for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 150, 200, 15, 8, 10, 4.5f);
-        new Building("HeavyTurret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 200, 300, 30, 2, 3, 8);
-        new Building("MachineTurret", 0.1f, 10, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 130, 250, 10, 13, 50, 7.5f);
+        new Building("HeavyTurret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 200, 300, 30, 2, 5, 8);
+        new Building("MachineTurret", 0.1f, 7, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 130, 250, 10, 13, 50, 7.5f);
         new Building("ArmyCamp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 300, 450, 0, 0, 0,0);
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         

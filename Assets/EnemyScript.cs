@@ -1,22 +1,28 @@
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public GameDataBaseScript gameDataBaseScript;
-    private NavMeshAgent agent;
+    public SpriteRenderer spriteRenderer;
+    public Rigidbody2D rb;
     public float[] weights = {0,0};
     public float health = 100, speed = 1.2f;
     public float hitCooldown = 0;
     public GameObject targetMain;
     void Start()
     {
-        gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+        gameControlScript = GameObject.Find("GameControl").
+        GetComponent<GameControlScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
         health = 100;
-        MoveTowards(transform.position - new Vector3(-Random.Range(0.5f, 1f),0,0));
+
+        /*transform.rotation = Quaternion.Euler(0,0,-90);
+        rb.linearVelocity = transform.right * 20;*/
+        transform.Rotate(0,0,Random.Range(0,360));
     }
     void Update()
     {
@@ -54,11 +60,12 @@ public class EnemyScript : MonoBehaviour
             MoveTowards(target.transform.position);
         }
 
-        if(name.Contains("Builder"))
-        {
-            
-        }
+        float x = rb.linearVelocity.x;
 
+        if (x < 0)
+            spriteRenderer.flipX = true;
+        else if (x > 0)
+            spriteRenderer.flipX = false;
 
         targetMain = target;
     }
@@ -67,7 +74,6 @@ public class EnemyScript : MonoBehaviour
     {
         //Vector2 direction = (player.transform.position - transform.position);
         Vector2 direction = (targetPosition - transform.position);
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
         
         direction.y = direction.y;
         direction.x = direction.x;
@@ -111,13 +117,17 @@ public class EnemyScript : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if(collision.name.Contains("Enemy") && name.Contains("Troop"))
+        if(collision.name.Contains("Enemy") && name.Contains("Troop") && hitCooldown <= 0)
         {
             health -= 10;
             hitCooldown = 1;
+            if (health <= 0)
+            {
+                Destroy(gameObject);
+            }
         }
         if(collision.name.Contains("Troop") && name.Contains("Enemy")&& hitCooldown <= 0) {
-            health -= 10;
+            health -= 5;
             hitCooldown = 1;
             if (health <= 0)
             {
@@ -126,7 +136,7 @@ public class EnemyScript : MonoBehaviour
             }
         }
 
-        if(collision.name.Contains("Turret") && name.Contains("Enemy")&& hitCooldown <= 0)
+        if((collision.name.Contains("Turret") || collision.name.Contains("Camp")) && name.Contains("Enemy")&& hitCooldown <= 0)
         {
             collision.GetComponent<BuildingScript>().health -= 10;
             hitCooldown = 1;

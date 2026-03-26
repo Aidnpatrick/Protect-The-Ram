@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
@@ -5,6 +6,7 @@ public class BuildingScript : MonoBehaviour
     public GameControlScript gameControlScript;
     public Building building;
     public GameObject bulletPrefab, troopPrefab;
+    public GameObject reloadSmokeParticle;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
 
@@ -39,6 +41,8 @@ public class BuildingScript : MonoBehaviour
 
     void Update()
     {
+        numOfTroops = Mathf.Clamp(numOfTroops, 0,5);
+
         shotCooldown -= Time.deltaTime;
         if(typeOfBuilding == 0)
         {
@@ -88,6 +92,15 @@ public class BuildingScript : MonoBehaviour
     {
         isReloading = true;
         reloadingCooldown = building.reload;
+        StartCoroutine(reloadEffect());
+    }
+    IEnumerator reloadEffect()
+    {
+        for(int i = 0 ; i < building.reload; i++)
+        {
+            gameControlScript.CreateParticle(reloadSmokeParticle, transform.position - new Vector3(0.5f,0, 0), 0, "Smoke", true);
+            yield return new WaitForSeconds(1f);
+        }
     }
 
     void Shoot()
@@ -116,11 +129,9 @@ public class BuildingScript : MonoBehaviour
 
         bulletClone.name = "Bullet" + building.name.Replace("Turret", "");
 
-        Rigidbody2D rb = bulletClone.GetComponent<Rigidbody2D>();
-        if(rb != null)
-        {
-            rb.linearVelocity = bulletClone.transform.right * 20;
-        }
+        Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
+        
+            brb.linearVelocity = bulletClone.transform.right * 20;
         ammo--;
         Destroy(bulletClone.gameObject, 4);
     }
@@ -129,7 +140,9 @@ public class BuildingScript : MonoBehaviour
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);
         troopClone.transform.position += new Vector3(-Random.Range(0.5f, 1f),0,0);
-        troopClone.GetComponent<SpriteRenderer>().color = Color.darkGreen;
+        troopClone.GetComponent<SpriteRenderer>().color = Color.white;
+        troopClone.GetComponent<SpriteRenderer>().sprite = Resources.        Load<Sprite>("Images/Troop");
+        troopClone.GetComponent<SpriteRenderer>().flipY = true;
         troopClone.tag = "Troop";
         troopClone.name = "Troop";
     }

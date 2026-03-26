@@ -14,7 +14,8 @@ public class MovingCamScript : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        transform.position = new Vector3(37, 2.85f, 0);
+        transform.position = new Vector3(37, 4f, 0);
+        
     }
 
     void Update()

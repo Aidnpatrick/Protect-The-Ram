@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Mono.Cecil;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,7 @@ public class GameControlScript : MonoBehaviour
     //prefab
     public GameObject selectionContainerPrefab;
     public GameObject tilePrefab, enemyPrefab, ramPrefab;
+    public GameObject ReloadSmokePrefab, firingPrefab;
     //libraries
     public GameObject[] enemies, turrets, troops, tiles;
     public Dictionary<GameObject, float> ramTracking = new Dictionary<GameObject, float>();
@@ -57,7 +59,7 @@ public class GameControlScript : MonoBehaviour
         }
 
         if(keyboard.jKey.wasPressedThisFrame)
-            SpawnEnemy(new Vector3(Random.Range(1,11), Random.Range(1,11), 1));
+            SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
     }
     public void SpawnEnemy(Vector3 location)
     {
@@ -107,15 +109,6 @@ public class GameControlScript : MonoBehaviour
             if(tileIndex.GetComponent<TileScript>().id == tileId) return tileIndex;
         return null;
     }
-
-    public void UpdateArrays()
-    {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        turrets = GameObject.FindGameObjectsWithTag("Buildings");
-        troops = GameObject.FindGameObjectsWithTag("Troop");
-        tiles = GameObject.FindGameObjectsWithTag("Tile");
-    }
-
     public GameObject FindNearestObjectDictionary(
     Dictionary<GameObject, float> targets,
     float lineOfSight,
@@ -143,11 +136,21 @@ public class GameControlScript : MonoBehaviour
         return closest;
     }
 
+    public void UpdateArrays()
+    {
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        turrets = GameObject.FindGameObjectsWithTag("Buildings");
+        troops = GameObject.FindGameObjectsWithTag("Troop");
+        tiles = GameObject.FindGameObjectsWithTag("Tile");
+    }
+
+
+    //GAMELOOP
     public void StartRound()
     {
         roundButton.SetActive(false);
         for(int i = 0; i < 10; i++)
-            SpawnEnemy(new Vector3(Random.Range(1,11), Random.Range(1,11), 1));
+            SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
         isRoundDone = false;
     }
     public void EndRound(bool isPassed = false)
@@ -157,5 +160,16 @@ public class GameControlScript : MonoBehaviour
         roundButton.SetActive(true);
         foreach(GameObject enemy in enemies)
             Destroy(enemy);
+    }
+
+    public GameObject CreateParticle(GameObject particle, Vector3 location, float amountOfRotation, string imageName, bool isTrans = false)
+    {
+        GameObject particleClone = Instantiate(particle, location, Quaternion.identity);
+        if(isTrans) particleClone.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, Random.Range(0.35f,0.75f));
+        particleClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + imageName);
+        Debug.Log("Images/ " + imageName);
+        particleClone.transform.Rotate(0,0,Random.Range(-amountOfRotation, amountOfRotation+1));
+        particleClone.GetComponent<Rigidbody2D>().linearVelocity = particleClone.transform.up * 3;
+        return particleClone;
     }
 }
