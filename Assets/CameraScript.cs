@@ -60,6 +60,7 @@ public class CameraScript : MonoBehaviour
             gameCanvas.worldCamera,
             out pos
         );
+        if(targetHit.name.Contains("Weed")) return;
         TMP_Text informationText = informationBox.transform.GetChild(0).GetComponent<TMP_Text>();
         Button informationButton = informationBox.transform.GetChild(1).GetComponent<Button>();
         Button informationDestroyButton = informationBox.transform.GetChild(2).GetComponent<Button>();
@@ -69,6 +70,7 @@ public class CameraScript : MonoBehaviour
             informationDestroyButton.gameObject.SetActive(true);
 
             informationText.text = targetHit.name;
+            
             informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().health + " HP\n";
 
             if(targetHit.name.Contains("Camp"))
@@ -160,14 +162,14 @@ public class CameraScript : MonoBehaviour
         }
 
         if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive)
-            BuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
+            BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
 
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame)
             Destroy(hit.transform.GetChild(0).gameObject);
     }
 
-    public void BuildOnTile(int targetId, GameObject targetTile)
+    public void BuildingBuildOnTile(int targetId, GameObject targetTile)
     {
         Building targetBuilding = gameDataBaseScript.FindBuildingClassById(targetId);
         
@@ -177,9 +179,11 @@ public class CameraScript : MonoBehaviour
         buildingClone.GetComponent<BuildingScript>().building = new Building(targetBuilding);
     }
 
+
     public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
     {
         GameObject targetTile = gameControlScript.FindTile(tileId);
+        if(targetTile.transform.childCount > 0) return null;
         GameObject targetChild = Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
         Debug.Log(targetTile + " " + targetChild);
         return targetChild;

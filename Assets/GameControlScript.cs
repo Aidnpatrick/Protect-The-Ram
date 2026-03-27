@@ -12,9 +12,10 @@ public class GameControlScript : MonoBehaviour
     public CameraScript cameraScript;
     public GameObject selectionContainer;
     public GameObject roundButton;
+    public TMP_Text selectionText;
     //prefab
     public GameObject selectionContainerPrefab;
-    public GameObject tilePrefab, enemyPrefab, ramPrefab;
+    public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab;
     public GameObject ReloadSmokePrefab, firingPrefab;
     //libraries
     public GameObject[] enemies, turrets, troops, tiles;
@@ -46,6 +47,7 @@ public class GameControlScript : MonoBehaviour
         }
         UpdateArrays();
         ramTracking.Add(cameraScript.BuildOnTileMisc(ramPrefab, 495), 100);
+        SpawnInGroups(weedPrefab, 100);
     }
 
     void Update()
@@ -60,6 +62,8 @@ public class GameControlScript : MonoBehaviour
 
         if(keyboard.jKey.wasPressedThisFrame)
             SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+
+        selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
     }
     public void SpawnEnemy(Vector3 location)
     {
@@ -132,7 +136,6 @@ public class GameControlScript : MonoBehaviour
                 closest = obj;
             }
         }
-
         return closest;
     }
 
@@ -142,6 +145,10 @@ public class GameControlScript : MonoBehaviour
         turrets = GameObject.FindGameObjectsWithTag("Buildings");
         troops = GameObject.FindGameObjectsWithTag("Troop");
         tiles = GameObject.FindGameObjectsWithTag("Tile");
+    }
+    public void SpawnInGroups(GameObject child, int numberOfChilds)
+    {
+        for(int i = 0; i < numberOfChilds; i++) cameraScript.BuildOnTileMisc(child, Random.Range(0, tiles.Length+1));
     }
 
 
@@ -172,4 +179,5 @@ public class GameControlScript : MonoBehaviour
         particleClone.GetComponent<Rigidbody2D>().linearVelocity = particleClone.transform.up * 3;
         return particleClone;
     }
+    
 }
