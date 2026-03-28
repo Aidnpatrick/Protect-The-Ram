@@ -109,12 +109,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   gameControlScript: {fileID: 0}
   gameDataBaseScript: {fileID: 0}
+  childGameObject: {fileID: 0}
+  bulletPrefab: {fileID: 413854545547773602, guid: 5ac9924803b2d3b41a80ff8a92d80a1f, type: 3}
+  spriteRenderer: {fileID: 0}
+  childSpriteRenderer: {fileID: 0}
+  rb: {fileID: 0}
   weights:
   - 0
   - 0
   health: 100
   speed: 1.2
   hitCooldown: 0
+  shotCooldown: 0
   targetMain: {fileID: 0}
 --- !u!50 &8442724521060156614
 Rigidbody2D:

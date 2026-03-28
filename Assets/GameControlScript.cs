@@ -13,9 +13,10 @@ public class GameControlScript : MonoBehaviour
     public GameObject selectionContainer;
     public GameObject roundButton;
     public TMP_Text selectionText;
+    public GameObject scrollSelectionContainer, informationText;
     //prefab
     public GameObject selectionContainerPrefab;
-    public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab;
+    public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab, gunPrefab;
     public GameObject ReloadSmokePrefab, firingPrefab;
     //libraries
     public GameObject[] enemies, turrets, troops, tiles;
@@ -23,10 +24,12 @@ public class GameControlScript : MonoBehaviour
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
     public int money = 0;
+    public bool isTABactive = true;
 
 
     void Start()
     {
+        isTABactive = true;
         money = 0;
         isRoundDone = true;
         currentSelectionId = -1;
@@ -47,7 +50,8 @@ public class GameControlScript : MonoBehaviour
         }
         UpdateArrays();
         ramTracking.Add(cameraScript.BuildOnTileMisc(ramPrefab, 495), 100);
-        SpawnInGroups(weedPrefab, 100);
+        SpawnInGroups(weedPrefab, 70
+        );
     }
 
     void Update()
@@ -63,11 +67,24 @@ public class GameControlScript : MonoBehaviour
         if(keyboard.jKey.wasPressedThisFrame)
             SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
 
+        if(keyboard.tabKey.wasReleasedThisFrame)
+        {
+            isTABactive = !isTABactive;
+        }
         selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
+
+
+        informationText.SetActive(isTABactive);
     }
+
     public void SpawnEnemy(Vector3 location)
     {
         GameObject enemyClone = Instantiate(enemyPrefab, location, Quaternion.identity);
+        if(Random.Range(0,10) <= 100f)
+        {
+            GameObject gunClone = Instantiate(gunPrefab, enemyClone.transform.position, Quaternion.identity, enemyClone.transform);
+            gunClone.GetComponent<SpriteRenderer>().flipY = false;
+        }
     }
     public void UpdateContainer()
     {
@@ -174,9 +191,9 @@ public class GameControlScript : MonoBehaviour
         GameObject particleClone = Instantiate(particle, location, Quaternion.identity);
         if(isTrans) particleClone.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, Random.Range(0.35f,0.75f));
         particleClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + imageName);
-        Debug.Log("Images/ " + imageName);
         particleClone.transform.Rotate(0,0,Random.Range(-amountOfRotation, amountOfRotation+1));
         particleClone.GetComponent<Rigidbody2D>().linearVelocity = particleClone.transform.up * 3;
+        Destroy(particleClone, 1.2f);
         return particleClone;
     }
     

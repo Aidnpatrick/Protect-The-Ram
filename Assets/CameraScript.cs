@@ -13,11 +13,13 @@ public class CameraScript : MonoBehaviour
     public bool isInformationBoxActive = false;
     private Vector2 moveInput;
     public Collider2D hitMain = null;
+    public bool canEdit = true;
 
     //prefabs
     public GameObject buildingPrefab;
     void Start()
     {
+        canEdit = true;
         isInformationBoxActive = false;
     }
     void UpdateInformationBoxSelection(Building building, Vector2 screenPosition)
@@ -45,6 +47,9 @@ public class CameraScript : MonoBehaviour
             "\nDamage: " + building.damage +
             "\nFireRate: " + building.fireRate +
             "\nInformation: " + building.information;
+        
+        informationBox.transform.GetChild(1).gameObject.SetActive(false);
+        informationBox.transform.GetChild(2).gameObject.SetActive(false);
     }
 
     void OpenInformationBox(GameObject targetHit)
@@ -72,7 +77,7 @@ public class CameraScript : MonoBehaviour
             informationText.text = targetHit.name;
             
             informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().health + " HP\n";
-
+            if(targetHit.name.Contains("Turret")) informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().ammo + " Ammo\n";
             if(targetHit.name.Contains("Camp"))
                 informationButton.gameObject.SetActive(true);
             else
@@ -88,6 +93,7 @@ public class CameraScript : MonoBehaviour
                 hitMain = targetHit.transform.GetChild(0).GetComponent<Collider2D>();
                 informationText.text = targetHit.transform.GetChild(0).name;
                 informationText.text += "\n" + targetHit.transform.GetChild(0).GetComponent<BuildingScript>().health + " HP\n";
+                if(targetHit.transform.GetChild(0).name.Contains("Turret")) informationText.text += "\n" + targetHit.transform.GetChild(0).GetComponent<BuildingScript>().ammo + " Ammo\n";
                 if(targetHit.transform.GetChild(0).name.Contains("Camp"))
                     informationButton.gameObject.SetActive(true);
                 else
@@ -119,7 +125,7 @@ public class CameraScript : MonoBehaviour
     {
         Keyboard keyboard = Keyboard.current;
 
-        int index = 0;
+        int index = 0, mouseTouched = 0;
         foreach(Transform selectionContainerIndex in gameControlScript.selectionContainer.transform)
         {
             Vector2 mousePosUI = Input.mousePosition;
@@ -133,15 +139,27 @@ public class CameraScript : MonoBehaviour
                 isInformationBoxActive = !isInformationBoxActive;
                 return;
             }
+            if(RectTransformUtility.RectangleContainsScreenPoint(
+                selectionContainerIndex.GetComponent<Image>().rectTransform, 
+                mousePosUI, 
+                gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera))
+            {
+                mouseTouched++;
+            }
             index++;
         }
+        if(mouseTouched > 0) canEdit = false;
+        else canEdit = true;
 
         transform.position = player.transform.position + new Vector3(0,0,-5);
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos);
         informationBox.SetActive(isInformationBoxActive);
-        if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame)
+
+        if(!canEdit) return; 
+
+        if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame && !hit.transform.name.Contains("Ram"))
         {
             Destroy(hit.gameObject);
             return;
@@ -165,7 +183,7 @@ public class CameraScript : MonoBehaviour
             BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
 
 
-        if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame)
+        if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
             Destroy(hit.transform.GetChild(0).gameObject);
     }
 

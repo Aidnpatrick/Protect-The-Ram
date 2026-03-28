@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 12633815}
   - component: {fileID: 12633814}
   m_Layer: 5
-  m_Name: Info
+  m_Name: InfoText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -176,8 +176,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "How to use: \nclick: place down item\nright click: get item info\nx +
-    hover: delete\nWASD: move camera"
+  m_text: "[TEST] \n[TAB to toggle instructions]\nHow to use: \nCLICK on grass with
+    selection: place down item\nRIGHT CLICK on object : commands and item information\nX
+    + HOVER on object: delete\nWASD: move camera\nFeedback helps this project a lot
+    :)\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -388,12 +390,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132811474}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.05995, y: 6.61336, z: 0}
   m_LocalScale: {x: 1, y: 11, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 965834149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &158987596
 GameObject:
@@ -725,7 +727,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.10849059, g: 0.5874583, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -800,6 +802,7 @@ MonoBehaviour:
   informationBox: {fileID: 1408947596}
   isInformationBoxActive: 0
   hitMain: {fileID: 0}
+  canEdit: 1
   buildingPrefab: {fileID: 5499999412485478788, guid: 3f5aebf60ff725f418847d760ff49884, type: 3}
 --- !u!1 &600260733
 GameObject:
@@ -814,7 +817,7 @@ GameObject:
   - component: {fileID: 600260736}
   - component: {fileID: 600260735}
   m_Layer: 5
-  m_Name: Scroll View
+  m_Name: SelectionContainerScroll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1759,11 +1762,46 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 943135569}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25, y: 10, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 23.94005, y: 11.61336, z: 0}
   m_LocalScale: {x: 50, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
+  m_Father: {fileID: 965834149}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &965834148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 965834149}
+  m_Layer: 0
+  m_Name: Barrier
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &965834149
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965834148}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.05995, y: -1.61336, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 943135572}
+  - {fileID: 1784485858}
+  - {fileID: 132811477}
+  - {fileID: 2116034105}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &969007149
@@ -2042,7 +2080,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 37}
+  m_SizeDelta: {x: 200, y: 64.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1369869806
 MonoBehaviour:
@@ -2091,8 +2129,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2432,11 +2470,14 @@ MonoBehaviour:
   selectionContainer: {fileID: 942133154}
   roundButton: {fileID: 1831106549}
   selectionText: {fileID: 605994144}
+  scrollSelectionContainer: {fileID: 600260733}
+  informationText: {fileID: 12633812}
   selectionContainerPrefab: {fileID: 8807707537792291571, guid: dca9570efd2c72148be024601c67a7ba, type: 3}
   tilePrefab: {fileID: 7047345270141723953, guid: aa694909f913cbc41b625f2eab23705e, type: 3}
   enemyPrefab: {fileID: 5429567172040925814, guid: cdfe9705bf48ea940ba826cae5ed53b8, type: 3}
   ramPrefab: {fileID: 102331153093008306, guid: ba833ac8f2c7ed443a0b08e39039ce05, type: 3}
   weedPrefab: {fileID: 8749748005103319265, guid: fd6822890170cc64eb6fb057482ad0b8, type: 3}
+  gunPrefab: {fileID: 7027538940473513825, guid: e23943ff531be5e45a6ba8c898963465, type: 3}
   ReloadSmokePrefab: {fileID: 3083088421436362795, guid: 0b0bf69b1632cc843a80202dd0768dd9, type: 3}
   firingPrefab: {fileID: 0}
   enemies: []
@@ -2446,6 +2487,7 @@ MonoBehaviour:
   currentSelectionId: 0
   isRoundDone: 1
   money: 0
+  isTABactive: 1
 --- !u!114 &1575609325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2897,12 +2939,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1784485855}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 5, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 48.94005, y: 6.61336, z: 0}
   m_LocalScale: {x: 1, y: 11, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 965834149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1831106549
 GameObject:
@@ -3168,12 +3210,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2116034102}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25, y: -1, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 23.94005, y: 0.61336005, z: 0}
   m_LocalScale: {x: 50, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 965834149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -3185,7 +3227,4 @@ SceneRoots:
   - {fileID: 1039066806}
   - {fileID: 1754435024}
   - {fileID: 969007154}
-  - {fileID: 2116034105}
-  - {fileID: 943135572}
-  - {fileID: 132811477}
-  - {fileID: 1784485858}
+  - {fileID: 965834149}

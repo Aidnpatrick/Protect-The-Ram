@@ -5,7 +5,7 @@ public class BuildingScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public Building building;
-    public GameObject bulletPrefab, troopPrefab;
+    public GameObject bulletPrefab, troopPrefab, gunPrefab;
     public GameObject reloadSmokeParticle;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
@@ -139,11 +139,22 @@ public class BuildingScript : MonoBehaviour
     void SpawnTroop()
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);
-        troopClone.transform.position += new Vector3(-Random.Range(0.5f, 1f),0,0);
+        troopClone.transform.position += new Vector3(-Random.Range(0.5f, 1f),-Random.Range(-0.5f,0.6f),0);
         troopClone.GetComponent<SpriteRenderer>().color = Color.white;
-        troopClone.GetComponent<SpriteRenderer>().sprite = Resources.        Load<Sprite>("Images/Troop");
+        troopClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/Troop");
         troopClone.GetComponent<SpriteRenderer>().flipY = true;
+        if(Random.Range(0,10) <= 100f)
+            Instantiate(gunPrefab, troopClone.transform.position, Quaternion.identity, troopClone.transform);
         troopClone.tag = "Troop";
         troopClone.name = "Troop";
+    }
+    
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.name.Contains("Bullet") && collision.name.Contains("Enemy"))
+        {
+            Destroy(collision.gameObject);
+            health -= 5;
+        }
     }
 }

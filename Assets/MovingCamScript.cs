@@ -29,6 +29,7 @@ public class MovingCamScript : MonoBehaviour
             if (Keyboard.current.aKey.isPressed && transform.position.x > -5) moveInput.x -= 1;
             if (Keyboard.current.dKey.isPressed && transform.position.x < 55) moveInput.x += 1;           
         }
+        
 
         if (Input.anyKeyDown &&
         !Input.GetMouseButtonDown(0) &&
