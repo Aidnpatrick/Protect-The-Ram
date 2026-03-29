@@ -48,7 +48,12 @@ public class GameControlScript : MonoBehaviour
             selectionContainerClone.transform.GetChild(0).GetComponent<TMP_Text>().text = turretsIndex.name;
         }
         UpdateArrays();
-        ramTracking.Add(cameraScript.BuildOnTileMisc(ramPrefab, 495), 100);
+        GameObject ram = BuildOnTileMisc(ramPrefab, 495);
+
+        if (ram != null)
+        {
+            ramTracking.Add(ram, 100);
+        }
         SpawnInGroups(weedPrefab, 70
         );
     }
@@ -166,7 +171,7 @@ public class GameControlScript : MonoBehaviour
     public void SpawnInGroups(GameObject child, int numberOfChilds)
     {
         for(int i = 0; i < numberOfChilds; i++) {
-            GameObject clone = cameraScript.BuildOnTileMisc(child, Random.Range(0, tiles.Length+1));
+            GameObject clone = BuildOnTileMisc(child, Random.Range(0, tiles.Length+1));
         }
     }
 
@@ -205,4 +210,19 @@ public class GameControlScript : MonoBehaviour
         return particleClone;
     }
     
+        public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
+    {
+        GameObject targetTile = FindTile(tileId);
+
+        if (targetTile == null)
+        {
+            Debug.LogError("Tile not found: " + tileId);
+            return null;
+        }
+
+        if (targetTile.transform.childCount > 0)
+            return null;
+
+        return Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
+    }
 }

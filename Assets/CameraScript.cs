@@ -192,12 +192,5 @@ public void DestroyBuilding()
     }
 
 
-    public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
-    {
-        GameObject targetTile = gameControlScript.FindTile(tileId);
-        if(targetTile.transform.childCount > 0) return null;
-        GameObject targetChild = Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
-//        Debug.Log(targetTile + " " + targetChild);
-        return targetChild;
-    }
+
 }
