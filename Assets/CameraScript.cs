@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using Unity.VisualScripting;
 
 public class CameraScript : MonoBehaviour
 {
@@ -27,36 +28,31 @@ public class CameraScript : MonoBehaviour
         RectTransform canvasRect = gameCanvas.GetComponent<RectTransform>();
         RectTransform infoRect = informationBox.GetComponent<RectTransform>();
 
-        Camera cam = gameCanvas.renderMode == RenderMode.ScreenSpaceOverlay 
-            ? null 
-            : gameCanvas.worldCamera;
-
-        Vector2 localPoint;
+        Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect,
-            screenPosition,
-            cam,
-            out localPoint
+            Input.mousePosition,
+            gameCanvas.worldCamera,
+            out pos
         );
 
-        infoRect.anchoredPosition = localPoint + new Vector2(100, 100);
+        infoRect.anchoredPosition = pos + new Vector2(100,100);
 
-        TMP_Text infoText = informationBox.transform.GetChild(0).GetComponent<TMP_Text>();
-        infoText.text =
-            building.name +
-            "\nDamage: " + building.damage +
-            "\nFireRate: " + building.fireRate +
-            "\nInformation: " + building.information;
-        
-        informationBox.transform.GetChild(1).gameObject.SetActive(false);
-        informationBox.transform.GetChild(2).gameObject.SetActive(false);
+        Transform boxTransform = informationBox.transform;
+        TMP_Text infoText = boxTransform.GetChild(0).GetComponent<TMP_Text>();
+        GameObject button1 = boxTransform.GetChild(1).gameObject;
+        GameObject button2 = boxTransform.GetChild(2).gameObject;
+
+        infoText.text = $"{building.name}" + $"\nDamage: {building.damage}" + $"\nFireRate: {building.fireRate}" + $"\nInformation: {building.information}";
+
+        button1.SetActive(false);
+        button2.SetActive(false);
     }
-
     void OpenInformationBox(GameObject targetHit)
     {
+        if (targetHit.name.Contains("Weed") || targetHit.name.Contains("Ram")) return;
 
         RectTransform canvasRect = informationBox.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
-
 
         Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -65,62 +61,57 @@ public class CameraScript : MonoBehaviour
             gameCanvas.worldCamera,
             out pos
         );
-        if(targetHit.name.Contains("Weed")) return;
+
         TMP_Text informationText = informationBox.transform.GetChild(0).GetComponent<TMP_Text>();
         Button informationButton = informationBox.transform.GetChild(1).GetComponent<Button>();
         Button informationDestroyButton = informationBox.transform.GetChild(2).GetComponent<Button>();
-        if(targetHit.transform.parent != null)
-        {
-            hitMain = targetHit.GetComponent<Collider2D>();
-            informationDestroyButton.gameObject.SetActive(true);
 
-            informationText.text = targetHit.name;
-            
-            informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().health + " HP\n";
-            if(targetHit.name.Contains("Turret")) informationText.text += "\n" + targetHit.GetComponent<BuildingScript>().ammo + " Ammo\n";
-            if(targetHit.name.Contains("Camp"))
-                informationButton.gameObject.SetActive(true);
-            else
-                informationButton.gameObject.SetActive(false);
+        GameObject actualTarget = targetHit;
+
+        if (targetHit.transform.parent == null && targetHit.transform.childCount > 0)
+        {
+            actualTarget = targetHit.transform.GetChild(0).gameObject;
+        }
+
+        if (actualTarget == null || actualTarget.GetComponent<BuildingScript>() == null)
+        {
+            informationText.text = "Empty";
+            informationDestroyButton.gameObject.SetActive(true);
+            informationButton.gameObject.SetActive(false);
         }
         else
         {
+            BuildingScript building = actualTarget.GetComponent<BuildingScript>();
+            hitMain = actualTarget.GetComponent<Collider2D>();
 
-            if(targetHit.transform.childCount > 0)
-            {
+            informationDestroyButton.gameObject.SetActive(true);
 
-                informationDestroyButton.gameObject.SetActive(true);    
-                hitMain = targetHit.transform.GetChild(0).GetComponent<Collider2D>();
-                informationText.text = targetHit.transform.GetChild(0).name;
-                informationText.text += "\n" + targetHit.transform.GetChild(0).GetComponent<BuildingScript>().health + " HP\n";
-                if(targetHit.transform.GetChild(0).name.Contains("Turret")) informationText.text += "\n" + targetHit.transform.GetChild(0).GetComponent<BuildingScript>().ammo + " Ammo\n";
-                if(targetHit.transform.GetChild(0).name.Contains("Camp"))
-                    informationButton.gameObject.SetActive(true);
-                else
-                    informationButton.gameObject.SetActive(false);
-            }
-            else
-            {
-                informationText.text = "Empty";
-                informationDestroyButton.gameObject.SetActive(true);
-                informationButton.gameObject.SetActive(false);
-            }
+            informationText.text = actualTarget.name;
+            informationText.text += "\n" + building.health + " HP\n";
+
+            if (actualTarget.name.Contains("Turret"))
+                informationText.text += "\n" + building.ammo + " Ammo\n";
+
+            informationButton.gameObject.SetActive(actualTarget.name.Contains("Camp"));
         }
+
         informationBox.GetComponent<RectTransform>().anchoredPosition = pos + new Vector2(200, 100);
 
         isInformationBoxActive = !isInformationBoxActive;
-
     }
-    public void MakeMoreTroops()
+public void MakeMoreTroops()
     {
         BuildingScript bs = hitMain.GetComponent<BuildingScript>();
         bs.numOfTroops = Mathf.Clamp(bs.numOfTroops+1,0,5);
     }
     
-    public void DestroyBuilding()
+public void DestroyBuilding()
+{
+    if (hitMain != null && !hitMain.name.Contains("Ram"))
     {
         Destroy(hitMain.gameObject);
     }
+}
     void Update()
     {
         Keyboard keyboard = Keyboard.current;
@@ -180,7 +171,10 @@ public class CameraScript : MonoBehaviour
         }
 
         if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive)
+        {
             BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
+            gameControlScript.currentSelectionId = -1;
+        }
 
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
@@ -203,7 +197,7 @@ public class CameraScript : MonoBehaviour
         GameObject targetTile = gameControlScript.FindTile(tileId);
         if(targetTile.transform.childCount > 0) return null;
         GameObject targetChild = Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
-        Debug.Log(targetTile + " " + targetChild);
+//        Debug.Log(targetTile + " " + targetChild);
         return targetChild;
     }
 }

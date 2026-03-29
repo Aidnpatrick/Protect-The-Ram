@@ -22,7 +22,7 @@ public class BuildingScript : MonoBehaviour
         if(building == null)
             return;
 
-        Debug.Log("Images/" + name.Replace("(Clone)", ""));
+//        Debug.Log("Images/" + name.Replace("(Clone)", ""));
         if(Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", "")) != null) {
             GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", ""));
         }

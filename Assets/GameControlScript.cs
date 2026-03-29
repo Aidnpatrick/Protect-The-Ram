@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Mono.Cecil;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -65,7 +64,7 @@ public class GameControlScript : MonoBehaviour
         }
 
         if(keyboard.jKey.wasPressedThisFrame)
-            SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+            SpawnEnemy(new Vector3(Random.Range(1f,9f), Random.Range(1f,9f), 1));
 
         if(keyboard.tabKey.wasReleasedThisFrame)
         {
@@ -77,7 +76,7 @@ public class GameControlScript : MonoBehaviour
         informationText.SetActive(isTABactive);
     }
 
-    public void SpawnEnemy(Vector3 location)
+    public GameObject SpawnEnemy(Vector3 location)
     {
         GameObject enemyClone = Instantiate(enemyPrefab, location, Quaternion.identity);
         if(Random.Range(0,10) <= 100f)
@@ -85,6 +84,7 @@ public class GameControlScript : MonoBehaviour
             GameObject gunClone = Instantiate(gunPrefab, enemyClone.transform.position, Quaternion.identity, enemyClone.transform);
             gunClone.GetComponent<SpriteRenderer>().flipY = false;
         }
+        return enemyClone;
     }
     public void UpdateContainer()
     {
@@ -165,8 +165,11 @@ public class GameControlScript : MonoBehaviour
     }
     public void SpawnInGroups(GameObject child, int numberOfChilds)
     {
-        for(int i = 0; i < numberOfChilds; i++) cameraScript.BuildOnTileMisc(child, Random.Range(0, tiles.Length+1));
+        for(int i = 0; i < numberOfChilds; i++) {
+            GameObject clone = cameraScript.BuildOnTileMisc(child, Random.Range(0, tiles.Length+1));
+        }
     }
+
 
 
     //GAMELOOP
@@ -175,6 +178,11 @@ public class GameControlScript : MonoBehaviour
         roundButton.SetActive(false);
         for(int i = 0; i < 10; i++)
             SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+
+        GameObject cyberTruckClone = SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+        cyberTruckClone.name = "CyberTruck";
+        cyberTruckClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/CyberTruck");
+
         isRoundDone = false;
     }
     public void EndRound(bool isPassed = false)
