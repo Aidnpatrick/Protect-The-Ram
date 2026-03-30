@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -9,7 +11,7 @@ public class GameControlScript : MonoBehaviour
 
     public GameDataBaseScript gameDataBaseScript;
     public CameraScript cameraScript;
-    public GameObject selectionContainer;
+    public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText;
     public GameObject scrollSelectionContainer, informationText;
@@ -22,7 +24,7 @@ public class GameControlScript : MonoBehaviour
     public Dictionary<GameObject, float> ramTracking = new Dictionary<GameObject, float>();
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
-    public int money = 0;
+    public int money = 0, numberOfRounds = 0, amountOfLand = 30;
     public bool isTABactive = true;
 
 
@@ -30,8 +32,13 @@ public class GameControlScript : MonoBehaviour
     {
         isTABactive = true;
         money = 0;
+        amountOfLand = 100;
+        numberOfRounds = 0;
         isRoundDone = true;
         currentSelectionId = -1;
+
+        notificationContainer.SetActive(false);
+
         int index = 0;
         for(int i = 0; i < 50; i++)
         {
@@ -54,8 +61,7 @@ public class GameControlScript : MonoBehaviour
         {
             ramTracking.Add(ram, 100);
         }
-        SpawnInGroups(weedPrefab, 70
-        );
+        SpawnInGroups(weedPrefab, 70);
     }
 
     void Update()
@@ -76,7 +82,6 @@ public class GameControlScript : MonoBehaviour
             isTABactive = !isTABactive;
         }
         selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
-
 
         informationText.SetActive(isTABactive);
     }
@@ -175,11 +180,20 @@ public class GameControlScript : MonoBehaviour
         }
     }
 
+    public void TileBlinkBoundary()
+    {
+
+        foreach(GameObject tile in tiles)
+        {
+            tile.GetComponent<TileScript>().BlinkBoundary();
+        }
+    }
 
 
     //GAMELOOP
     public void StartRound()
     {
+        numberOfRounds++;
         roundButton.SetActive(false);
         for(int i = 0; i < 10; i++)
             SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
@@ -187,11 +201,17 @@ public class GameControlScript : MonoBehaviour
         GameObject cyberTruckClone = SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
         cyberTruckClone.name = "CyberTruck";
         cyberTruckClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/CyberTruck");
+        
+        
+        notificationContainer.SetActive(true);
+        notificationContainer.GetComponentInChildren<TMP_Text>().text = "Round " + numberOfRounds + "\nEnemies come from left!";
+        StartCoroutine(NotificationText(notificationContainer));
 
         isRoundDone = false;
     }
     public void EndRound(bool isPassed = false)
     {
+        amountOfLand += 10;
         isRoundDone = true;
 
         roundButton.SetActive(true);
@@ -210,13 +230,12 @@ public class GameControlScript : MonoBehaviour
         return particleClone;
     }
     
-        public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
+    public GameObject BuildOnTileMisc(GameObject prefab, int tileId)
     {
         GameObject targetTile = FindTile(tileId);
 
         if (targetTile == null)
         {
-            Debug.LogError("Tile not found: " + tileId);
             return null;
         }
 
@@ -224,5 +243,11 @@ public class GameControlScript : MonoBehaviour
             return null;
 
         return Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
+    }
+
+    IEnumerator NotificationText(GameObject container)
+    {
+        yield return new WaitForSeconds(2.5f);
+        container.SetActive(false);
     }
 }

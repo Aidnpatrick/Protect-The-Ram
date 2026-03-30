@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using Unity.VisualScripting;
+using UnityEngine.Tilemaps;
 
 public class CameraScript : MonoBehaviour
 {
@@ -156,29 +156,40 @@ public void DestroyBuilding()
             return;
         }
 
-        if (Input.GetMouseButtonDown(1) && hit.transform.parent != null)
+        if (Input.GetMouseButtonDown(1) && hit != null &&hit.transform.parent != null)
         {
             OpenInformationBox(hit.gameObject);
             return;
         }
 
         if(hit == null || !hit.gameObject.name.Contains("Tile")) return;
-        
+
+
+        TileScript tileScript = hit.GetComponent<TileScript>();
+
         if (Input.GetMouseButtonDown(1))
         {
             OpenInformationBox(hit.gameObject);
             return;
         }
 
-        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive)
+        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive
+        && 500 - gameControlScript.amountOfLand < tileScript.id)
         {
             BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
             gameControlScript.currentSelectionId = -1;
         }
 
-
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
             Destroy(hit.transform.GetChild(0).gameObject);
+
+        if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+        {
+            Debug.Log("BLINK");
+
+            
+            gameControlScript.TileBlinkBoundary();
+        }
     }
 
     public void BuildingBuildOnTile(int targetId, GameObject targetTile)

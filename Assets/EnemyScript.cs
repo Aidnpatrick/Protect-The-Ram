@@ -1,7 +1,4 @@
 
-using Mono.Cecil;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -40,12 +37,10 @@ public class EnemyScript : MonoBehaviour
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
             speed = 3.2f;
             health = 250;
-            GetComponent<CircleCollider2D>().radius = 4.5f;
+            GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
         }
         
-        /*transform.rotation = Quaternion.Euler(0,0,-90);
-        rb.linearVelocity = transform.right * 20;*/
         transform.Rotate(0,0,Random.Range(0,360));
     }
     void Update()
@@ -58,10 +53,8 @@ public class EnemyScript : MonoBehaviour
         closestTurret = gameControlScript.FindNearestObject(gameControlScript.turrets, 50, gameObject);
         GameObject ram = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
 
-        if (name.Contains("Enemy") || name.Contains("CyberTruck"))
+        if (name.Contains("Enemy"))
         {
-
-
             if (closestTroop == null && closestTurret == null)
                 target = ram;
             else if (closestTroop == null)
@@ -79,11 +72,12 @@ public class EnemyScript : MonoBehaviour
         {
             target = closestTurret;
         }
-        else if (name.Contains("Troop"))
-            target = gameControlScript.FindNearestObject(gameControlScript.enemies, childGameObject != null ? 13f : 10, gameObject);
-
+        
+        if(target == null)
+            target = ram;
         //else if(name.Contains("CyberTruck"))
-            
+        if (name.Contains("Troop"))
+            target = gameControlScript.FindNearestObject(gameControlScript.enemies, childGameObject != null ? 13f : 10, gameObject);
 
         if (target != null)
         {
@@ -101,6 +95,7 @@ public class EnemyScript : MonoBehaviour
         }
         else if(target == null)
         {
+            
             rb.linearVelocity = Vector2.zero;
         }
         /*
@@ -154,7 +149,8 @@ public class EnemyScript : MonoBehaviour
             }
         }
         if(target == null)
-        target = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
+            target = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
+
         if(target == null)
         {
             Debug.Log("target error");
@@ -257,6 +253,16 @@ public class EnemyScript : MonoBehaviour
             collision.GetComponent<BuildingScript>().health -= 25;
             Destroy(gameObject);
         }
+        
+        if(collision.name.Contains("Ram") && name.Contains("CyberTruck"))
+        {
+            Destroy(gameObject);
+        }
+        if((collision.name.Contains("Troop") || collision.name.Contains("Enemy")) && name.Contains("CyberTruck"))
+        {
+            Destroy(collision.gameObject);
+        }
+        
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -277,6 +283,7 @@ public class EnemyScript : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+
 
         if(collision.CompareTag("Buildings") && name.Contains("Enemy")&& hitCooldown <= 0)
         {
