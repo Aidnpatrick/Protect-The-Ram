@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -14,13 +13,13 @@ public class GameControlScript : MonoBehaviour
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText;
-    public GameObject scrollSelectionContainer, informationText;
+    public GameObject scrollSelectionContainer, informationText, controlTroopText;
     //prefab
     public GameObject selectionContainerPrefab;
     public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab, gunPrefab;
     public GameObject ReloadSmokePrefab, firingPrefab;
     //libraries
-    public GameObject[] enemies, turrets, troops, tiles;
+    public GameObject[] enemies, turrets, troops, tiles, armycamps;
     public Dictionary<GameObject, float> ramTracking = new Dictionary<GameObject, float>();
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
@@ -81,8 +80,12 @@ public class GameControlScript : MonoBehaviour
         {
             isTABactive = !isTABactive;
         }
-        selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
+        if(cameraScript.isControllingTroops)
+            selectionText.text = "Curretly Controlling Troops!";
+        else
+            selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
 
+        controlTroopText.SetActive(cameraScript.isControllingTroops);
         informationText.SetActive(isTABactive);
     }
 
@@ -140,6 +143,7 @@ public class GameControlScript : MonoBehaviour
             if(tileIndex.GetComponent<TileScript>().id == tileId) return tileIndex;
         return null;
     }
+    
     public GameObject FindNearestObjectDictionary(
     Dictionary<GameObject, float> targets,
     float lineOfSight,
@@ -180,14 +184,6 @@ public class GameControlScript : MonoBehaviour
         }
     }
 
-    public void TileBlinkBoundary()
-    {
-
-        foreach(GameObject tile in tiles)
-        {
-            tile.GetComponent<TileScript>().BlinkBoundary();
-        }
-    }
 
 
     //GAMELOOP
@@ -195,12 +191,19 @@ public class GameControlScript : MonoBehaviour
     {
         numberOfRounds++;
         roundButton.SetActive(false);
-        for(int i = 0; i < 10; i++)
+        Debug.Log(Random.Range(0,2*Random.Range(0,numberOfRounds)));
+
+        for(int i = 0; i < Random.Range(1,Random.Range(0,numberOfRounds*10)) + 2; i++)
             SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
 
-        GameObject cyberTruckClone = SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
-        cyberTruckClone.name = "CyberTruck";
-        cyberTruckClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/CyberTruck");
+
+        for(int i = 0; i < Random.Range(1,2*Random.Range(0,numberOfRounds)); i++)
+        {
+            GameObject cyberTruckClone = SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+            cyberTruckClone.name = "CyberTruck";
+            cyberTruckClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/CyberTruck");
+        }
+
         
         
         notificationContainer.SetActive(true);

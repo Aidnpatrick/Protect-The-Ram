@@ -13,15 +13,17 @@ public class EnemyScript : MonoBehaviour
     public float[] weights = {0,0};
     public float health = 100, speed = 1.2f;
     public float hitCooldown = 0, shotCooldown;
-    public GameObject targetMain, wayPoint = null;
+    public GameObject targetMain, wayPoint = null, originArmyCamp;
     public GameObject closestTroop, closestTurret;
+    public bool isControlled;
     void Start()
     {
-
+        isControlled = false;
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         gameControlScript = GameObject.Find("GameControl").
         GetComponent<GameControlScript>();
+        cameraScript = GameObject.Find("Main Camera").GetComponent<CameraScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
         health = 75;
 
@@ -69,26 +71,32 @@ public class EnemyScript : MonoBehaviour
             }
         }
         if(name.Contains("CyberTruck"))
-        {
             target = closestTurret;
-        }
         
         if(target == null)
             target = ram;
         //else if(name.Contains("CyberTruck"))
         if (name.Contains("Troop"))
-            target = gameControlScript.FindNearestObject(gameControlScript.enemies, childGameObject != null ? 13f : 10, gameObject);
+        {
+            if(isControlled)
+                target = cameraScript.targetMain;
+            else
+                target = gameControlScript.FindNearestObject(gameControlScript.enemies, childGameObject != null ? 13f : 10, gameObject);
+        }
 
         if (target != null)
         {
-            if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) < 10 && shotCooldown <= 0)
+
+            if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) < 8 && shotCooldown <= 0)
             {
                 Shoot();
 
                 //MoveTowards(transform.position);
                 shotCooldown = 1;
             }
-            else if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) > 10)
+            if(isControlled)
+                MoveTowards(target.transform.position);
+            else if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) > 8)
                 MoveTowards(target.transform.position);
             else if(childGameObject == null)
                 MoveTowards(target.transform.position);
@@ -117,7 +125,7 @@ public class EnemyScript : MonoBehaviour
     void UpdateSpriteFacing()
     {
         float zRotation = transform.eulerAngles.z;
-        if (zRotation > 180) zRotation -= 360; // normalize -180 to 180
+        if (zRotation > 180) zRotation -= 360;
 
         bool facingLeft = zRotation > 90 || zRotation < -90;
         if(name.Contains("Troop"))    
@@ -134,8 +142,8 @@ public class EnemyScript : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero;
         GameObject target;
-        target = gameControlScript.FindNearestObject(gameControlScript.enemies, 10, gameObject);
-        if(name.Contains("Enemy"))
+        target = gameControlScript.FindNearestObject(gameControlScript.enemies, 8, gameObject); // troop
+        if(name.Contains("Enemy")) // enemy
         {
             if (closestTroop == null && closestTurret == null) target = null;
             else if (closestTroop == null) target = closestTurret;
@@ -148,12 +156,11 @@ public class EnemyScript : MonoBehaviour
                 
             }
         }
-        if(target == null)
+        if(target == null && name.Contains("Enemy")) //whatever
             target = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
 
         if(target == null)
         {
-            Debug.Log("target error");
             return;
         }
 
@@ -169,7 +176,7 @@ public class EnemyScript : MonoBehaviour
 
         bulletClone.transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        bulletClone.transform.Rotate(0, 0, Random.Range(-10f, 10f));
+        bulletClone.transform.Rotate(0, 0, Random.Range(10f, 10f));
 
         bulletClone.name = "Bullet" + name;
 
@@ -199,6 +206,7 @@ public class EnemyScript : MonoBehaviour
         rb.MoveRotation(angle);
         rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
     }
+
     void OnDestroy()
     {
         if (name.Contains("CyberTruck"))
@@ -208,6 +216,11 @@ public class EnemyScript : MonoBehaviour
                 gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f, 0.6f), Random.Range(-0.5f, 0.6f), 0));
                 Destroy(wayPoint);
             }
+        }
+        if(name.Contains("Troop"))
+        {
+            if(originArmyCamp != null)
+                originArmyCamp.GetComponent<BuildingScript>().numOfTroops--;
         }
     }
 
@@ -219,7 +232,9 @@ public class EnemyScript : MonoBehaviour
             Destroy(collision.gameObject);
             foreach(Building currentBuilding in gameDataBaseScript.buildings)
             {
-                if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "")))
+                Debug.Log(currentBuilding.name.Replace("Turret", ""));
+
+                if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "").Replace("Turret", "")))
                 {
                     health -= currentBuilding.damage / 2;
                     if (health <= 0)
@@ -229,7 +244,8 @@ public class EnemyScript : MonoBehaviour
                     }
                     return;
                 }
-            }        
+            }
+            Debug.Log("No damage");
         }
         if(collision.name.Contains("Bullet") && !collision.name.Contains("Troop") && !collision.name.Contains("Turret") && name.Contains("Troop"))
         {
@@ -239,6 +255,7 @@ public class EnemyScript : MonoBehaviour
             if(health <= 0)
                 Destroy(gameObject);
         }
+
         if(collision.name.Contains("Bullet") && collision.name.Contains("Troop") && (name.Contains("Enemy") || name.Contains("CyberTruck")))
         {
             Destroy(collision.gameObject);
@@ -255,13 +272,9 @@ public class EnemyScript : MonoBehaviour
         }
         
         if(collision.name.Contains("Ram") && name.Contains("CyberTruck"))
-        {
             Destroy(gameObject);
-        }
         if((collision.name.Contains("Troop") || collision.name.Contains("Enemy")) && name.Contains("CyberTruck"))
-        {
             Destroy(collision.gameObject);
-        }
         
     }
     private void OnTriggerStay2D(Collider2D collision)

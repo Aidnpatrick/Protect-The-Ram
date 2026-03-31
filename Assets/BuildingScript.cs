@@ -36,7 +36,6 @@ public class BuildingScript : MonoBehaviour
             typeOfBuilding = 0;
         if(building.name.Contains("Camp")) 
             typeOfBuilding = 1;
-
     }
 
     void Update()
@@ -50,10 +49,10 @@ public class BuildingScript : MonoBehaviour
         }
         if(typeOfBuilding == 1)
         {
-            if(shotCooldown <= 0 && numOfTroops > 0)
+            if(!gameControlScript.isRoundDone && shotCooldown <= 0 && numOfTroops < 5)
             {
-                numOfTroops -= 1;
                 SpawnTroop();
+                numOfTroops++;
                 shotCooldown = building.fireRate;
             }
         }
@@ -74,13 +73,11 @@ public class BuildingScript : MonoBehaviour
             }
             return;
         }
-
         if(ammo <= 0)
         {
             StartReload();
             return;
         }
-
         if(shotCooldown <= 0)
         {
             Shoot();
@@ -127,7 +124,8 @@ public class BuildingScript : MonoBehaviour
 
         bulletClone.transform.Rotate(0, 0, Random.Range(-building.recoil, building.recoil+1));
 
-        bulletClone.name = "Bullet" + building.name.Replace("Turret", "");
+        bulletClone.name = "Bullet" + building.name;
+        
 
         Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
         
@@ -140,9 +138,12 @@ public class BuildingScript : MonoBehaviour
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);
         troopClone.transform.position += new Vector3(-Random.Range(0.5f, 1f),-Random.Range(-0.5f,0.6f),0);
+        troopClone.GetComponent<EnemyScript>().originArmyCamp = gameObject;
+
         troopClone.GetComponent<SpriteRenderer>().color = Color.white;
         troopClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/Troop");
         troopClone.GetComponent<SpriteRenderer>().flipY = true;
+
         if(Random.Range(0,10) <= 100f)
             Instantiate(gunPrefab, troopClone.transform.position, Quaternion.identity, troopClone.transform);
         troopClone.tag = "Troop";

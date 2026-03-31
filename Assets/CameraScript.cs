@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.Tilemaps;
+using System.Security.Cryptography;
 
 public class CameraScript : MonoBehaviour
 {
@@ -14,13 +15,16 @@ public class CameraScript : MonoBehaviour
     public bool isInformationBoxActive = false;
     private Vector2 moveInput;
     public Collider2D hitMain = null;
-    public bool canEdit = true;
+    public bool canEdit = true, isControllingTroops = false;
 
     //prefabs
     public GameObject buildingPrefab;
+
+    public GameObject targetMain;
     void Start()
     {
         canEdit = true;
+        isControllingTroops = false;
         isInformationBoxActive = false;
     }
     void UpdateInformationBoxSelection(Building building, Vector2 screenPosition)
@@ -40,13 +44,11 @@ public class CameraScript : MonoBehaviour
 
         Transform boxTransform = informationBox.transform;
         TMP_Text infoText = boxTransform.GetChild(0).GetComponent<TMP_Text>();
-        GameObject button1 = boxTransform.GetChild(1).gameObject;
-        GameObject button2 = boxTransform.GetChild(2).gameObject;
+        GameObject destroyButton = boxTransform.GetChild(1).gameObject;
 
         infoText.text = $"{building.name}" + $"\nDamage: {building.damage}" + $"\nFireRate: {building.fireRate}" + $"\nInformation: {building.information}";
 
-        button1.SetActive(false);
-        button2.SetActive(false);
+        destroyButton.SetActive(false);
     }
     void OpenInformationBox(GameObject targetHit)
     {
@@ -63,8 +65,7 @@ public class CameraScript : MonoBehaviour
         );
 
         TMP_Text informationText = informationBox.transform.GetChild(0).GetComponent<TMP_Text>();
-        Button informationButton = informationBox.transform.GetChild(1).GetComponent<Button>();
-        Button informationDestroyButton = informationBox.transform.GetChild(2).GetComponent<Button>();
+        Button informationDestroyButton = informationBox.transform.GetChild(1).GetComponent<Button>();
 
         GameObject actualTarget = targetHit;
 
@@ -77,7 +78,6 @@ public class CameraScript : MonoBehaviour
         {
             informationText.text = "Empty";
             informationDestroyButton.gameObject.SetActive(true);
-            informationButton.gameObject.SetActive(false);
         }
         else
         {
@@ -91,8 +91,6 @@ public class CameraScript : MonoBehaviour
 
             if (actualTarget.name.Contains("Turret"))
                 informationText.text += "\n" + building.ammo + " Ammo\n";
-
-            informationButton.gameObject.SetActive(actualTarget.name.Contains("Camp"));
         }
 
         informationBox.GetComponent<RectTransform>().anchoredPosition = pos + new Vector2(200, 100);
@@ -116,6 +114,13 @@ public void DestroyBuilding()
     {
         Keyboard keyboard = Keyboard.current;
 
+        // controlling troops
+        if(keyboard.rKey.wasPressedThisFrame)
+        {
+            isControllingTroops = !isControllingTroops;
+        }
+
+        // selection information box
         int index = 0, mouseTouched = 0;
         foreach(Transform selectionContainerIndex in gameControlScript.selectionContainer.transform)
         {
@@ -142,14 +147,16 @@ public void DestroyBuilding()
         if(mouseTouched > 0) canEdit = false;
         else canEdit = true;
 
+        //camera 
         transform.position = player.transform.position + new Vector3(0,0,-5);
+
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos);
         informationBox.SetActive(isInformationBoxActive);
 
-        if(!canEdit) return; 
-
+        if(!canEdit) return;
+        // children on tile
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame && !hit.transform.name.Contains("Ram"))
         {
             Destroy(hit.gameObject);
@@ -164,6 +171,7 @@ public void DestroyBuilding()
 
         if(hit == null || !hit.gameObject.name.Contains("Tile")) return;
 
+        // parent on tile
 
         TileScript tileScript = hit.GetComponent<TileScript>();
 
@@ -182,14 +190,19 @@ public void DestroyBuilding()
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
             Destroy(hit.transform.GetChild(0).gameObject);
-
-        if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+        
+        if(isControllingTroops && Input.GetMouseButtonDown(0))
         {
-            Debug.Log("BLINK");
-
-            
-            gameControlScript.TileBlinkBoundary();
+            gameControlScript.currentSelectionId = -1;
+            targetMain = hit.gameObject;
+            ControlTroopTarget();
         }
+    }
+    
+    void ControlTroopTarget()
+    {
+        foreach(GameObject troop in gameControlScript.troops)
+            troop.GetComponent<EnemyScript>().isControlled = true;
     }
 
     public void BuildingBuildOnTile(int targetId, GameObject targetTile)
