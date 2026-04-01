@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using UnityEngine.Tilemaps;
-using System.Security.Cryptography;
-
 public class CameraScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
@@ -12,6 +9,9 @@ public class CameraScript : MonoBehaviour
     public Canvas gameCanvas;
     public GameObject player;
     public GameObject informationBox;
+
+    public GameObject notificationContainer;
+    public GameObject notificationPrefab;
     public bool isInformationBoxActive = false;
     private Vector2 moveInput;
     public Collider2D hitMain = null;
@@ -46,7 +46,7 @@ public class CameraScript : MonoBehaviour
         TMP_Text infoText = boxTransform.GetChild(0).GetComponent<TMP_Text>();
         GameObject destroyButton = boxTransform.GetChild(1).gameObject;
 
-        infoText.text = $"{building.name}" + $"\nDamage: {building.damage}" + $"\nFireRate: {building.fireRate}" + $"\nInformation: {building.information}";
+        infoText.text = $"{building.name}" + $"\nDamage: {building.damage}" + $"\nCost: {building.cost}" + $"\nInformation: {building.information}";
 
         destroyButton.SetActive(false);
     }
@@ -180,13 +180,40 @@ public void DestroyBuilding()
             OpenInformationBox(hit.gameObject);
             return;
         }
-
-        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive
-        && 500 - gameControlScript.amountOfLand < tileScript.id)
+        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive && !isControllingTroops)
         {
+            if(500 - gameControlScript.amountOfLand < tileScript.id && gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
+            {
+                gameControlScript.money -= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost;
+                BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
+                gameControlScript.currentSelectionId = -1;
+            }
+            else if(500 - gameControlScript.amountOfLand >= tileScript.id)
+            {
+                gameControlScript.NotificationText("Can't place here!");
+            }
+            else if(gameControlScript.money < gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
+            {
+                gameControlScript.NotificationText("Invalid funds!");
+                gameControlScript.currentSelectionId = -1;
+            }
+        }
+        /*
+        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive
+        && 500 - gameControlScript.amountOfLand < tileScript.id && !isControllingTroops && gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost) 
+        {
+            gameControlScript.money -= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost;
             BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
             gameControlScript.currentSelectionId = -1;
         }
+        else if(Input.GetMouseButtonDown(0) && 500 - gameControlScript.amountOfLand >= tileScript.id)
+        {
+            gameControlScript.NotificationText("Can't place here!");
+        }
+        else if(gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
+        {
+        }
+        */
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
             Destroy(hit.transform.GetChild(0).gameObject);

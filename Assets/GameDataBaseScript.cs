@@ -19,20 +19,33 @@ public class Building
     public int ammo = 0;
     public float reload = 0;
     public static List<Building> buildingCurrent = new List<Building>();
-    public Building(string n, float f, float d, string i, int id, string image, int c, int h, float r, float recoil, int a, float reload)
+    public Building(
+        string name,
+        float fireRate,
+        float damage,
+        string information,
+        int id,
+        string image,
+        int cost,
+        int health,
+        float range,
+        float recoil,
+        int ammo,
+        float reload)
     {
         buildingCurrent.Add(this);
-        name = n;
-        fireRate = f;
-        damage = d;
-        information = i;
+
+        this.name = name;
+        this.fireRate = fireRate;
+        this.damage = damage;
+        this.information = information;
         this.id = id;
         this.image = image;
-        cost = c;
-        health = h;
-        range = r;
+        this.cost = cost;
+        this.health = health;
+        this.range = range;
         this.recoil = recoil;
-        ammo = a;
+        this.ammo = ammo;
         this.reload = reload;
     }
 
@@ -74,11 +87,11 @@ public class GameDataBaseScript : MonoBehaviour
     {
         Building.buildingCurrent.Clear(); // prevent duplicates
         
-        new Building("BasicTurret",1,35,"Versatile, fit for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 150, 300, 15, 4, 10, 4.5f);
-        
-        new Building("HeavyTurret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 400, 20, 1, 5, 8);
-        new Building("MachineTurret", 0.1f, 6f, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 300, 300, 15, 15, 50, 7.5f);
-        new Building("ArmyCamp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 200, 450, 0, 0, 0,0);
+        new Building("Basic Turret",1,38,"Versatile, good for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 100, 200, 15, 4, 10, 3f);
+        new Building("Heavy Turret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 400, 20, 1, 5, 8);
+        new Building("Machine Turret", 0.1f, 6f, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 350, 300, 15, 15, 50, 7.5f);
+        new Building("Army Camp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 300, 450, 0, 0, 0,0);
+        //new Building("Gold Mine", 0, 150, "A building that gives passive income. Can only be placed on deposits.", 4, "GoldMine", 180, 150, 0, 0, 0, 0);
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
 

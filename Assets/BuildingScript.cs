@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Data.SqlTypes;
 using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
@@ -23,10 +24,8 @@ public class BuildingScript : MonoBehaviour
             return;
 
 //        Debug.Log("Images/" + name.Replace("(Clone)", ""));
-        if(Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", "")) != null) {
-            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + name.Replace("(Clone)", ""));
-        }
-
+        if(Resources.Load<Sprite>("Images/" + building.image.Replace("(Clone)", "")) != null)
+            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/" + building.image);
             
         shotCooldown = building.fireRate;
         ammo = building.ammo;
@@ -36,6 +35,12 @@ public class BuildingScript : MonoBehaviour
             typeOfBuilding = 0;
         if(building.name.Contains("Camp")) 
             typeOfBuilding = 1;
+        if(building.name.Contains("Mine"))
+        {
+            typeOfBuilding = 2;
+            
+            gameControlScript.amountOfMines++;            
+        }
     }
 
     void Update()
@@ -133,7 +138,14 @@ public class BuildingScript : MonoBehaviour
         ammo--;
         Destroy(bulletClone.gameObject, 4);
     }
-    
+    void OnDestroy()
+    {
+        gameControlScript.money += building.cost / 2;
+
+        if(typeOfBuilding == 2)
+            gameControlScript.amountOfMines -= 1;
+        
+    }
     void SpawnTroop()
     {
         GameObject troopClone = Instantiate(troopPrefab, transform.position, Quaternion.identity);

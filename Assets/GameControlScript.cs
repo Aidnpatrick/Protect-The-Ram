@@ -10,17 +10,28 @@ public class GameControlScript : MonoBehaviour
 
     public GameDataBaseScript gameDataBaseScript;
     public CameraScript cameraScript;
+
+
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
-    public TMP_Text selectionText;
+    public TMP_Text selectionText, gameStatText;
     public GameObject scrollSelectionContainer, informationText, controlTroopText;
+
+
     //prefab
     public GameObject selectionContainerPrefab;
     public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab, gunPrefab;
     public GameObject ReloadSmokePrefab, firingPrefab;
+    public GameObject notificationPrefab;
+
+
     //libraries
-    public GameObject[] enemies, turrets, troops, tiles, armycamps;
+    public GameObject[] enemies, turrets, troops, tiles;
+    public int amountOfMines = 0;
+    public List<int> depositLocations = new List<int>();
     public Dictionary<GameObject, float> ramTracking = new Dictionary<GameObject, float>();
+
+
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
     public int money = 0, numberOfRounds = 0, amountOfLand = 30;
@@ -30,13 +41,20 @@ public class GameControlScript : MonoBehaviour
     void Start()
     {
         isTABactive = true;
-        money = 0;
+        money = 500;
         amountOfLand = 100;
         numberOfRounds = 0;
         isRoundDone = true;
         currentSelectionId = -1;
 
-        notificationContainer.SetActive(false);
+        amountOfMines = 0;
+
+        notificationContainer.SetActive(true);
+        for(int i = 0; i < 25; i++)
+        {
+            int randomLocation = Random.Range(0,100);
+            if(depositLocations.Contains(randomLocation)) depositLocations.Add(randomLocation);
+        }
 
         int index = 0;
         for(int i = 0; i < 50; i++)
@@ -45,14 +63,21 @@ public class GameControlScript : MonoBehaviour
             {
                 GameObject tileClone = Instantiate(tilePrefab, new Vector3(i, j, 0), Quaternion.identity);
                 tileClone.GetComponent<TileScript>().id = index;
+                if(depositLocations.Contains(index)) 
+                {
+                    //tileClone.GetComponent<TileScript>().oreDeposit = true;
+                    //tileClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/DepositTile");
+                }
                 index++;
             }
         }
+
         foreach(Building turretsIndex in gameDataBaseScript.buildings)
         {
             GameObject selectionContainerClone = Instantiate(selectionContainerPrefab, selectionContainer.transform);
             selectionContainerClone.transform.GetChild(0).GetComponent<TMP_Text>().text = turretsIndex.name;
         }
+
         UpdateArrays();
         GameObject ram = BuildOnTileMisc(ramPrefab, 495);
 
@@ -81,9 +106,11 @@ public class GameControlScript : MonoBehaviour
             isTABactive = !isTABactive;
         }
         if(cameraScript.isControllingTroops)
-            selectionText.text = "Curretly Controlling Troops!";
+            selectionText.text = "Currently Controlling Troops!";
         else
             selectionText.text = "Currently Selecting:\n" + (currentSelectionId >= 0 ? gameDataBaseScript.buildings[currentSelectionId].name : "None");
+
+        gameStatText.text = $"Round {numberOfRounds}\n${money}";
 
         controlTroopText.SetActive(cameraScript.isControllingTroops);
         informationText.SetActive(isTABactive);
@@ -191,29 +218,41 @@ public class GameControlScript : MonoBehaviour
     {
         numberOfRounds++;
         roundButton.SetActive(false);
-        Debug.Log(Random.Range(0,2*Random.Range(0,numberOfRounds)));
 
-        for(int i = 0; i < Random.Range(1,Random.Range(0,numberOfRounds*10)) + 2; i++)
-            SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
+        int budget = 10 + numberOfRounds * 5;
 
-
-        for(int i = 0; i < Random.Range(1,2*Random.Range(0,numberOfRounds)); i++)
+        while (budget > 0)
         {
-            GameObject cyberTruckClone = SpawnEnemy(new Vector3(Random.Range(1,9), Random.Range(1,9), 1));
-            cyberTruckClone.name = "CyberTruck";
-            cyberTruckClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/CyberTruck");
+            if (budget >= 5 && Random.value < 0.15f)
+            {
+                GameObject cyberTruck = SpawnEnemy(RandomPos());
+                cyberTruck.name = "CyberTruck";
+                cyberTruck.GetComponent<SpriteRenderer>().sprite =
+                    Resources.Load<Sprite>("Images/CyberTruck");
+                budget -= 5;
+            }
+            else
+            {
+                SpawnEnemy(RandomPos());
+                budget -= 1;
+            }
         }
 
-        
-        
-        notificationContainer.SetActive(true);
-        notificationContainer.GetComponentInChildren<TMP_Text>().text = "Round " + numberOfRounds + "\nEnemies come from left!";
-        StartCoroutine(NotificationText(notificationContainer));
+        GameObject notificationClone = Instantiate(notificationPrefab, notificationContainer.transform);
+        notificationClone.GetComponentInChildren<TMP_Text>().text =
+            "Round " + numberOfRounds + "\nEnemies coming!";
+        Destroy(notificationClone, 2.5f);
 
         isRoundDone = false;
     }
+
+Vector3 RandomPos()
+{
+    return new Vector3(Random.Range(1, 9), Random.Range(1, 9), 1);
+}
     public void EndRound(bool isPassed = false)
     {
+        money += amountOfMines * 100;
         amountOfLand += 10;
         isRoundDone = true;
 
@@ -248,9 +287,10 @@ public class GameControlScript : MonoBehaviour
         return Instantiate(prefab, targetTile.transform.position, Quaternion.identity, targetTile.transform);
     }
 
-    IEnumerator NotificationText(GameObject container)
+    public void NotificationText(string text)
     {
-        yield return new WaitForSeconds(2.5f);
-        container.SetActive(false);
+        GameObject notificationClone = Instantiate(notificationPrefab, notificationContainer.transform);
+        notificationClone.GetComponentInChildren<TMP_Text>().text = text;
+        Destroy(notificationClone, 2.5f);
     }
 }

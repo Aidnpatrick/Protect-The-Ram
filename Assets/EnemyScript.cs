@@ -26,9 +26,10 @@ public class EnemyScript : MonoBehaviour
         cameraScript = GameObject.Find("Main Camera").GetComponent<CameraScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
         health = 75;
-
+            speed = 1.8f;
         if(transform.childCount > 0)
         {
+
             childGameObject = transform.GetChild(0).gameObject;
             childSpriteRenderer = childGameObject.GetComponent<SpriteRenderer>();
             if(name.Contains("Troop")) childSpriteRenderer.flipY = true;
@@ -37,7 +38,7 @@ public class EnemyScript : MonoBehaviour
         if(name.Contains("CyberTruck"))
         {
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
-            speed = 3.2f;
+            speed = 3.5f;
             health = 250;
             GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
@@ -176,7 +177,8 @@ public class EnemyScript : MonoBehaviour
 
         bulletClone.transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        bulletClone.transform.Rotate(0, 0, Random.Range(10f, 10f));
+        bulletClone.transform.Rotate(0, 0, Random.Range(-10f, 11f));
+
 
         bulletClone.name = "Bullet" + name;
 
@@ -211,6 +213,8 @@ public class EnemyScript : MonoBehaviour
     {
         if (name.Contains("CyberTruck"))
         {
+            
+            gameControlScript.money += 20;
             for(int i = 0; i < 5; i++)
             {
                 gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f, 0.6f), Random.Range(-0.5f, 0.6f), 0));
@@ -232,20 +236,17 @@ public class EnemyScript : MonoBehaviour
             Destroy(collision.gameObject);
             foreach(Building currentBuilding in gameDataBaseScript.buildings)
             {
-                Debug.Log(currentBuilding.name.Replace("Turret", ""));
-
                 if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "").Replace("Turret", "")))
                 {
                     health -= currentBuilding.damage / 2;
                     if (health <= 0)
-                    {
-                        gameControlScript.money += 2;
+                    {                        
+                        gameControlScript.money += 6;
                         Destroy(gameObject);
                     }
                     return;
                 }
             }
-            Debug.Log("No damage");
         }
         if(collision.name.Contains("Bullet") && !collision.name.Contains("Troop") && !collision.name.Contains("Turret") && name.Contains("Troop"))
         {
@@ -277,6 +278,7 @@ public class EnemyScript : MonoBehaviour
             Destroy(collision.gameObject);
         
     }
+    /*
     private void OnTriggerStay2D(Collider2D collision)
     {
         
@@ -292,7 +294,7 @@ public class EnemyScript : MonoBehaviour
             hitCooldown = 1;
             if (health <= 0)
             {
-                gameControlScript.money += 2;
+                gameControlScript.money += 5;
                 Destroy(gameObject);
             }
         }
@@ -306,4 +308,5 @@ public class EnemyScript : MonoBehaviour
         if(collision.name.Contains("Ram"))
             gameControlScript.ramTracking[collision.gameObject] -= 10;
     }
+    */
 }
