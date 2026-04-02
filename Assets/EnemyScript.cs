@@ -25,7 +25,7 @@ public class EnemyScript : MonoBehaviour
         GetComponent<GameControlScript>();
         cameraScript = GameObject.Find("Main Camera").GetComponent<CameraScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
-        health = 75;
+        health = 100;
             speed = 1.8f;
         if(transform.childCount > 0)
         {
@@ -214,7 +214,8 @@ public class EnemyScript : MonoBehaviour
         if (name.Contains("CyberTruck"))
         {
             
-            gameControlScript.money += 20;
+            gameControlScript.money += 10;
+            gameControlScript.moneyMadeInRound += 10;
             for(int i = 0; i < 5; i++)
             {
                 gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f, 0.6f), Random.Range(-0.5f, 0.6f), 0));
@@ -242,6 +243,7 @@ public class EnemyScript : MonoBehaviour
                     if (health <= 0)
                     {                        
                         gameControlScript.money += 6;
+                        gameControlScript.moneyMadeInRound += 6;
                         Destroy(gameObject);
                     }
                     return;

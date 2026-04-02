@@ -38,8 +38,8 @@ public class BuildingScript : MonoBehaviour
         if(building.name.Contains("Mine"))
         {
             typeOfBuilding = 2;
-            
-            gameControlScript.amountOfMines++;            
+            if(transform.parent.name.Contains("Deposit"))
+                gameControlScript.amountOfMines++;            
         }
     }
 
@@ -142,8 +142,8 @@ public class BuildingScript : MonoBehaviour
     {
         gameControlScript.money += building.cost / 2;
 
-        if(typeOfBuilding == 2)
-            gameControlScript.amountOfMines -= 1;
+        if(typeOfBuilding == 2 && transform.parent.name.Contains("Deposit"))
+            gameControlScript.amountOfMines--;
         
     }
     void SpawnTroop()

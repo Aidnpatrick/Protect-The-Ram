@@ -87,11 +87,11 @@ public class GameDataBaseScript : MonoBehaviour
     {
         Building.buildingCurrent.Clear(); // prevent duplicates
         
-        new Building("Basic Turret",1,38,"Versatile, good for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 100, 200, 15, 4, 10, 3f);
-        new Building("Heavy Turret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 400, 20, 1, 5, 8);
-        new Building("Machine Turret", 0.1f, 6f, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 350, 300, 15, 15, 50, 7.5f);
+        new Building("Basic Turret",1,38,"Versatile, good for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 100, 250, 15, 4, 10, 3f);
+        new Building("Heavy Turret",4, 200,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 450, 20, 1, 5, 8);
+        new Building("Machine Turret", 0.1f, 9f, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 2, "MachineTUrret", 350, 350, 15, 10, 50, 6.5f);
         new Building("Army Camp", 4, 0, "Spawns a troop every 4 seconds.", 3, "ArmyCamp", 300, 450, 0, 0, 0,0);
-        //new Building("Gold Mine", 0, 150, "A building that gives passive income. Can only be placed on deposits.", 4, "GoldMine", 180, 150, 0, 0, 0, 0);
+        new Building("Gold Mine", 0, 0, "A building that gives passive income. Can only be placed on deposits.", 4, "GoldMine", 180, 150, 0, 0, 0, 0);
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
 

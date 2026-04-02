@@ -125,6 +125,7 @@ public void DestroyBuilding()
         foreach(Transform selectionContainerIndex in gameControlScript.selectionContainer.transform)
         {
             Vector2 mousePosUI = Input.mousePosition;
+            
             if (RectTransformUtility.RectangleContainsScreenPoint(
                 selectionContainerIndex.GetComponent<Image>().rectTransform, 
                 mousePosUI, 
@@ -144,6 +145,7 @@ public void DestroyBuilding()
             }
             index++;
         }
+        
         if(mouseTouched > 0) canEdit = false;
         else canEdit = true;
 
