@@ -1,4 +1,4 @@
-
+using System.Collections;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -25,8 +25,18 @@ public class EnemyScript : MonoBehaviour
         GetComponent<GameControlScript>();
         cameraScript = GameObject.Find("Main Camera").GetComponent<CameraScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
+        //default enemy
         health = 100;
-            speed = 1.8f;
+        speed = 1.8f;
+        /*
+        if(Random.value < 0.03f && name.Contains("Enemy") && !name.Contains("Spawner"))
+        {
+            transform.localScale = new Vector3(0.65f, 0.65f,1);
+            health *= 3;
+            speed = 2.3f;
+        }
+        */
+
         if(transform.childCount > 0)
         {
 
@@ -39,12 +49,29 @@ public class EnemyScript : MonoBehaviour
         {
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
             speed = 3.5f;
-            health = 250;
+            health = 280;
             GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
         }
-        
+
+        if (name.Contains("Spawner"))
+        {
+            health *= 4;
+            speed = 1.5f;
+            StartCoroutine(spawnEnemySpawner());
+            Destroy(transform.GetChild(0).gameObject);
+        }
         transform.Rotate(0,0,Random.Range(0,360));
+    }
+    IEnumerator spawnEnemySpawner()
+    {
+        while(true)
+        {
+            Debug.Log("asdsad");
+            for(int i = 0; i < 3; i++)
+                gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f,0.6f), Random.Range(-0.5f,0.6f), 0));
+            yield return new WaitForSeconds(8f);
+        }
     }
     void Update()
     {
@@ -88,18 +115,16 @@ public class EnemyScript : MonoBehaviour
         if (target != null)
         {
 
-            if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) < 8 && shotCooldown <= 0)
+            if((childGameObject != null || name.Contains("Spawner")) && Vector3.Distance(target.transform.position, transform.position) < 8 && shotCooldown <= 0)
             {
                 Shoot();
-
-                //MoveTowards(transform.position);
                 shotCooldown = 1;
             }
             if(isControlled)
                 MoveTowards(target.transform.position);
-            else if(childGameObject != null && Vector3.Distance(target.transform.position, transform.position) > 8)
+            else if((childGameObject != null || name.Contains("Spawner")) && Vector3.Distance(target.transform.position, transform.position) > 8)
                 MoveTowards(target.transform.position);
-            else if(childGameObject == null)
+            else if(childGameObject == null && !name.Contains("Spawner"))
                 MoveTowards(target.transform.position);
         }
         else if(target == null)
@@ -141,10 +166,12 @@ public class EnemyScript : MonoBehaviour
 
     public void Shoot()
     {
+        Debug.Log(gameObject + "Bam");
         rb.linearVelocity = Vector2.zero;
+
         GameObject target;
         target = gameControlScript.FindNearestObject(gameControlScript.enemies, 8, gameObject); // troop
-        if(name.Contains("Enemy")) // enemy
+        if(name.Contains("Enemy") || name.Contains("Spawner")) // enemy
         {
             if (closestTroop == null && closestTurret == null) target = null;
             else if (closestTroop == null) target = closestTurret;
@@ -157,7 +184,7 @@ public class EnemyScript : MonoBehaviour
                 
             }
         }
-        if(target == null && name.Contains("Enemy")) //whatever
+        if(target == null && (name.Contains("Enemy") || name.Contains("Spawner"))) //whatever
             target = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
 
         if(target == null)
@@ -184,6 +211,8 @@ public class EnemyScript : MonoBehaviour
 
         Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
         brb.linearVelocity = bulletClone.transform.right * 20;
+
+        if(bulletClone.GetComponent<SpriteRenderer>().sprite) {}
         Destroy(bulletClone.gameObject, 4);
         //rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }

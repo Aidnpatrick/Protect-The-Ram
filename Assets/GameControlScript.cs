@@ -1,8 +1,7 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Rendering;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -231,18 +230,27 @@ public class GameControlScript : MonoBehaviour
         moneyMadeInRound = 0;
 
         float budget = 10 + numberOfRounds * 5;
-        if(numberOfRounds > 10) budget *= 1.5f;
+        if(numberOfRounds > 10) budget *= 1.8f;
+        if(numberOfRounds > 15) budget *= 2.5f;
         if(numberOfRounds > 20) budget *= 3f;
 
         while (budget > 0)
         {
-            if (budget >= 5 && Random.value < 0.10f)
-
+            if (budget >= 5 && Random.value < 0.10f && numberOfRounds > 1)
             {
                 GameObject cyberTruck = SpawnEnemy(RandomPos());
                 cyberTruck.name = "CyberTruck";
                 cyberTruck.GetComponent<SpriteRenderer>().sprite =
                     Resources.Load<Sprite>("Images/CyberTruck");
+                budget -= 5;
+            }
+            else if(budget >= 0f && Random.value < 0.10f && numberOfRounds > 4)
+            {
+                GameObject spawner = SpawnEnemy(RandomPos());
+                spawner.name = "EnemySpawner";
+                
+                spawner.GetComponent<SpriteRenderer>().sprite =
+                Resources.Load<Sprite>("Images/EnemySpawner");
                 budget -= 5;
             }
             else
@@ -251,13 +259,9 @@ public class GameControlScript : MonoBehaviour
                 budget -= 1;
             }
         }
-
-        GameObject notificationClone = Instantiate(notificationPrefab, notificationContainer.transform);
-        notificationClone.GetComponentInChildren<TMP_Text>().text =
-            "Round " + numberOfRounds + "\nEnemies coming!";
-        Destroy(notificationClone, 2.5f);
-
-
+        NotificationText("Round " + numberOfRounds + "\nEnemies coming!");
+        if(numberOfRounds == 2 || numberOfRounds == 5)
+            NotificationText("New Enemy!");
         isRoundDone = false;
     }
     
@@ -269,7 +273,8 @@ public class GameControlScript : MonoBehaviour
         isRoundDone = true;
         NotificationText("Round Completed!\n+ $" + moneyMadeInRound);
         money += amountOfMines * 50;
-        NotificationText("Money produced from Gold Mines: + $" + amountOfMines * 50);
+        if(amountOfMines > 0)
+            NotificationText("Money produced from Gold Mines: + $" + amountOfMines * 90);
         money += 50;
         NotificationText("Bonus: + $50");
 
