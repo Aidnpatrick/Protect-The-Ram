@@ -244,7 +244,7 @@ public class GameControlScript : MonoBehaviour
                     Resources.Load<Sprite>("Images/CyberTruck");
                 budget -= 5;
             }
-            else if(budget >= 0f && Random.value < 0.10f && numberOfRounds > 4)
+            else if(budget >= 3f && Random.value < 0.10f && numberOfRounds > 4)
             {
                 GameObject spawner = SpawnEnemy(RandomPos());
                 spawner.name = "EnemySpawner";
@@ -287,6 +287,8 @@ public class GameControlScript : MonoBehaviour
             BuildingScript bs = building.GetComponent<BuildingScript>();
             bs.health = Mathf.Clamp(bs.health + 35, 0, bs.building.health);
         }
+        foreach(GameObject troop in troops)
+            Destroy(troop);
 
         if(Random.Range(0,7) < 1f)
         {

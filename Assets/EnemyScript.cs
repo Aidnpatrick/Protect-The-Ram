@@ -11,7 +11,7 @@ public class EnemyScript : MonoBehaviour
     public SpriteRenderer spriteRenderer, childSpriteRenderer;
     public Rigidbody2D rb, childRb;
     public float[] weights = {0,0};
-    public float health = 100, speed = 1.2f;
+    public float health = 100, speed = 1.8f;
     public float hitCooldown = 0, shotCooldown;
     public GameObject targetMain, wayPoint = null, originArmyCamp;
     public GameObject closestTroop, closestTurret;
@@ -26,8 +26,6 @@ public class EnemyScript : MonoBehaviour
         cameraScript = GameObject.Find("Main Camera").GetComponent<CameraScript>();
         gameDataBaseScript = GameObject.Find("GameControl").GetComponent<GameDataBaseScript>();
         //default enemy
-        health = 100;
-        speed = 1.8f;
         /*
         if(Random.value < 0.03f && name.Contains("Enemy") && !name.Contains("Spawner"))
         {
@@ -69,7 +67,12 @@ public class EnemyScript : MonoBehaviour
         {
             Debug.Log("asdsad");
             for(int i = 0; i < 3; i++)
-                gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f,0.6f), Random.Range(-0.5f,0.6f), 0));
+            {
+                GameObject smallEnemyClone = gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f,0.6f), Random.Range(-0.5f,0.6f), 0));
+                smallEnemyClone.transform.localScale = new Vector3(0.35f, 0.35f, 1);
+                EnemyScript smallEs = smallEnemyClone.GetComponent<EnemyScript>();
+                smallEs.health = 60;
+            }
             yield return new WaitForSeconds(8f);
         }
     }

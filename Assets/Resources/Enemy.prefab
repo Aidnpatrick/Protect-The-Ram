@@ -120,13 +120,15 @@ MonoBehaviour:
   - 0
   - 0
   health: 100
-  speed: 1.2
+  speed: 1.5
   hitCooldown: 0
   shotCooldown: 0
   targetMain: {fileID: 0}
   wayPoint: {fileID: 0}
+  originArmyCamp: {fileID: 0}
   closestTroop: {fileID: 0}
   closestTurret: {fileID: 0}
+  isControlled: 0
 --- !u!50 &8442724521060156614
 Rigidbody2D:
   serializedVersion: 5
