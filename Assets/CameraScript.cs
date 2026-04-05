@@ -2,17 +2,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using Unity.VisualScripting;
 public class CameraScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public GameDataBaseScript gameDataBaseScript;
     public Canvas gameCanvas;
     public GameObject player;
-    public GameObject informationBox;
+    public GameObject informationBox, selectionInformationBox;
 
     public GameObject notificationContainer;
     public GameObject notificationPrefab;
-    public bool isInformationBoxActive = false;
+    public bool isInformationBoxActive = false, isSelectionInformationBoxActive;
     private Vector2 moveInput;
     public Collider2D hitMain = null;
     public bool canEdit = true, isControllingTroops = false;
@@ -30,7 +31,7 @@ public class CameraScript : MonoBehaviour
     void UpdateInformationBoxSelection(Building building, Vector2 screenPosition)
     {
         RectTransform canvasRect = gameCanvas.GetComponent<RectTransform>();
-        RectTransform infoRect = informationBox.GetComponent<RectTransform>();
+        RectTransform infoRect = selectionInformationBox.GetComponent<RectTransform>();
 
         Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -42,17 +43,15 @@ public class CameraScript : MonoBehaviour
 
         infoRect.anchoredPosition = pos + new Vector2(100,100);
 
-        Transform boxTransform = informationBox.transform;
+        Transform boxTransform = selectionInformationBox.transform;
+
         TMP_Text infoText = boxTransform.GetChild(0).GetComponent<TMP_Text>();
-        GameObject destroyButton = boxTransform.GetChild(1).gameObject;
 
         infoText.text = $"{building.name}" + $"\nDamage: {building.damage}" + $"\nCost: {building.cost}" + $"\nInformation: {building.information}";
 
-        destroyButton.SetActive(false);
     }
     void OpenInformationBox(GameObject targetHit)
     {
-        if (targetHit.name.Contains("Weed") || targetHit.name.Contains("Ram")) return;
 
         RectTransform canvasRect = informationBox.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
 
@@ -73,24 +72,40 @@ public class CameraScript : MonoBehaviour
         {
             actualTarget = targetHit.transform.GetChild(0).gameObject;
         }
-
+        Debug.Log(actualTarget);
         if (actualTarget == null || actualTarget.GetComponent<BuildingScript>() == null)
         {
-            informationText.text = "Empty";
-            informationDestroyButton.gameObject.SetActive(true);
+            if (actualTarget.GetComponent<TileScript>() == null)
+            {
+                informationText.text = actualTarget.name.Replace("(Clone)", "");
+            }
+            else
+            {
+                if(targetHit.GetComponent<TileScript>().oreDeposit)
+                informationText.text = "Empty Ore Deposit";
+                else informationText.text = "Emtpy Tile";
+                informationDestroyButton.gameObject.SetActive(true);
+            }
+
         }
         else
         {
-            BuildingScript building = actualTarget.GetComponent<BuildingScript>();
-            hitMain = actualTarget.GetComponent<Collider2D>();
-
-            informationDestroyButton.gameObject.SetActive(true);
-
+            
             informationText.text = actualTarget.name;
-            informationText.text += "\n" + building.health + " HP\n";
 
-            if (actualTarget.name.Contains("Turret"))
-                informationText.text += "\n" + building.ammo + " Ammo\n";
+            if(actualTarget.GetComponent<BuildingScript>() != null) 
+            {
+                BuildingScript building = actualTarget.GetComponent<BuildingScript>();
+                hitMain = actualTarget.GetComponent<Collider2D>();
+
+                informationDestroyButton.gameObject.SetActive(true);
+
+                informationText.text += "\n" + building.health + " HP\n";
+
+                if (actualTarget.name.Contains("Turret"))
+                    informationText.text += "\n" + building.ammo + " Ammo\n";
+            }
+            
         }
 
         informationBox.GetComponent<RectTransform>().anchoredPosition = pos + new Vector2(200, 100);
@@ -129,25 +144,27 @@ public void DestroyBuilding()
             if (RectTransformUtility.RectangleContainsScreenPoint(
                 selectionContainerIndex.GetComponent<Image>().rectTransform, 
                 mousePosUI, 
-                gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera) && Input.GetMouseButtonDown(1))
+                gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera))
             {
                 UpdateInformationBoxSelection(gameDataBaseScript.buildings[index], selectionContainerIndex.GetComponent<RectTransform>().anchoredPosition);
 
-                isInformationBoxActive = !isInformationBoxActive;
-                return;
+                isSelectionInformationBoxActive = true;
+
+                
+                break;
+
             }
-            if(RectTransformUtility.RectangleContainsScreenPoint(
-                selectionContainerIndex.GetComponent<Image>().rectTransform, 
-                mousePosUI, 
-                gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera))
+            else
             {
                 mouseTouched++;
+                isSelectionInformationBoxActive = false;
             }
             index++;
         }
         
-        if(mouseTouched > 0) canEdit = false;
-        else canEdit = true;
+        if(mouseTouched == gameDataBaseScript.buildings.Count) canEdit = true;
+        else canEdit = false;
+
 
         //camera 
         transform.position = player.transform.position + new Vector3(0,0,-5);
@@ -156,6 +173,8 @@ public void DestroyBuilding()
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos);
         informationBox.SetActive(isInformationBoxActive);
+        selectionInformationBox.SetActive(isSelectionInformationBoxActive);
+        
 
         if(!canEdit) return;
         // children on tile
@@ -237,7 +256,6 @@ public void DestroyBuilding()
     public void BuildingBuildOnTile(int targetId, GameObject targetTile)
     {
         Building targetBuilding = gameDataBaseScript.FindBuildingClassById(targetId);
-        
         GameObject buildingClone = Instantiate(buildingPrefab, targetTile.transform.position, Quaternion.identity);
         buildingClone.name = targetBuilding.name;
         buildingClone.transform.parent = targetTile.transform;
