@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,7 +11,7 @@ public class GameControlScript : MonoBehaviour
     public GameDataBaseScript gameDataBaseScript;
     public CameraScript cameraScript;
 
-
+    public GameObject settingCanvas, gameCanvas;
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText, gameStatText;
@@ -36,12 +35,14 @@ public class GameControlScript : MonoBehaviour
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
     public int money = 0, numberOfRounds = 0, amountOfLand = 30, moneyMadeInRound = 0;
-    public bool isTABactive = true;
+    public bool isTABactive = true, isSettingsActive = false, isGameCanvasActive = false;
 
 
     void Start()
     {
+        isSettingsActive = false;
         isTABactive = true;
+        isGameCanvasActive = true;
         money = 500;
         amountOfLand = 100;
         numberOfRounds = 0;
@@ -52,6 +53,9 @@ public class GameControlScript : MonoBehaviour
         amountOfMines = 0;
 
         notificationContainer.SetActive(true);
+
+        NotificationText("Game Loaded!");
+
         for(int i = 0; i < 10; i++)
         {
             int randomLocation = Random.Range(100,500);
@@ -99,6 +103,9 @@ public class GameControlScript : MonoBehaviour
     }
     void Update()
     {
+            
+        gameCanvas.GetComponent<Canvas>().enabled = isGameCanvasActive;
+
         Keyboard keyboard = Keyboard.current;
         UpdateArrays();
     
@@ -123,6 +130,14 @@ public class GameControlScript : MonoBehaviour
 
         controlTroopText.SetActive(cameraScript.isControllingTroops);
         informationText.SetActive(isTABactive);
+
+        settingCanvas.SetActive(isSettingsActive);
+
+        if(keyboard.escapeKey.wasPressedThisFrame)
+            isSettingsActive = !isSettingsActive;
+
+        if(keyboard.lKey.wasPressedThisFrame)
+            isGameCanvasActive = !isGameCanvasActive;
     }
 
     public GameObject SpawnEnemy(Vector3 location)
@@ -236,7 +251,7 @@ public class GameControlScript : MonoBehaviour
 
         while (budget > 0)
         {
-            if (budget >= 5 && Random.value < 0.10f && numberOfRounds > 1)
+            if (budget >= 8 && Random.value < 0.10f && numberOfRounds > 1)
             {
                 GameObject cyberTruck = SpawnEnemy(RandomPos());
                 cyberTruck.name = "CyberTruck";
@@ -244,7 +259,7 @@ public class GameControlScript : MonoBehaviour
                     Resources.Load<Sprite>("Images/CyberTruck");
                 budget -= 5;
             }
-            else if(budget >= 3f && Random.value < 0.10f && numberOfRounds > 4)
+            else if(budget >= 4f && Random.value < 0.10f && numberOfRounds > 4)
             {
                 GameObject spawner = SpawnEnemy(RandomPos());
                 spawner.name = "EnemySpawner";
@@ -261,7 +276,7 @@ public class GameControlScript : MonoBehaviour
         }
         NotificationText("Round " + numberOfRounds + "\nEnemies coming!");
         if(numberOfRounds == 2 || numberOfRounds == 5)
-            NotificationText("New Enemy!");
+            NotificationText("A new enemy can now spawn!");
         isRoundDone = false;
     }
     
@@ -286,6 +301,7 @@ public class GameControlScript : MonoBehaviour
         {
             BuildingScript bs = building.GetComponent<BuildingScript>();
             bs.health = Mathf.Clamp(bs.health + 35, 0, bs.building.health);
+            if(bs.typeOfBuilding == 1) bs.ammo = bs.building.ammo;
         }
         foreach(GameObject troop in troops)
             Destroy(troop);
@@ -334,7 +350,7 @@ public class GameControlScript : MonoBehaviour
         notificationClone.GetComponentInChildren<TMP_Text>().text = text;
         Destroy(notificationClone, 2.5f);
     }
-    
+    public 
     void SpawnTroop(Vector3 location)
     {
         GameObject troopClone = Instantiate(enemyPrefab, location, Quaternion.identity);
@@ -350,4 +366,6 @@ public class GameControlScript : MonoBehaviour
         troopClone.tag = "Troop";
         troopClone.name = "Troop";
     }
+
+
 }

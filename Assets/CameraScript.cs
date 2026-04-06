@@ -2,11 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using Unity.VisualScripting;
+
 public class CameraScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public GameDataBaseScript gameDataBaseScript;
+    public Camera camera;
     public Canvas gameCanvas;
     public GameObject player;
     public GameObject informationBox, selectionInformationBox;
@@ -27,6 +28,8 @@ public class CameraScript : MonoBehaviour
         canEdit = true;
         isControllingTroops = false;
         isInformationBoxActive = false;
+
+        camera.orthographicSize = 5;
     }
     void UpdateInformationBoxSelection(Building building, Vector2 screenPosition)
     {
@@ -92,6 +95,7 @@ public class CameraScript : MonoBehaviour
         {
             
             informationText.text = actualTarget.name;
+            hitMain = actualTarget.GetComponent<Collider2D>();
 
             if(actualTarget.GetComponent<BuildingScript>() != null) 
             {
@@ -118,16 +122,26 @@ public void MakeMoreTroops()
         bs.numOfTroops = Mathf.Clamp(bs.numOfTroops+1,0,5);
     }
     
-public void DestroyBuilding()
-{
-    if (hitMain != null && !hitMain.name.Contains("Ram"))
+    public void DestroyBuilding()
     {
-        Destroy(hitMain.gameObject);
+        if (hitMain != null && !hitMain.name.Contains("Ram"))
+        {
+            Destroy(hitMain.gameObject);
+        }
     }
-}
     void Update()
     {
+
         Keyboard keyboard = Keyboard.current;
+
+        if (keyboard.tKey.isPressed && camera.orthographicSize >= 1f)
+            camera.orthographicSize -= 0.05f;
+
+        if(keyboard.yKey.isPressed && camera.orthographicSize <= 10)
+            camera.orthographicSize += 0.05f;
+
+        if(keyboard.gKey.isPressed)
+            camera.orthographicSize = 5;
 
         // controlling troops
         if(keyboard.rKey.wasPressedThisFrame)
@@ -184,7 +198,7 @@ public void DestroyBuilding()
             return;
         }
 
-        if (Input.GetMouseButtonDown(1) && hit != null &&hit.transform.parent != null)
+        if (Input.GetMouseButtonDown(1) && hit != null && hit.transform.parent != null)
         {
             OpenInformationBox(hit.gameObject);
             return;
@@ -201,8 +215,14 @@ public void DestroyBuilding()
             OpenInformationBox(hit.gameObject);
             return;
         }
+
         if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive && !isControllingTroops)
         {
+            if(gameDataBaseScript.buildings[gameControlScript.currentSelectionId].name.Contains("Gold") && !hit.GetComponent<TileScript>().oreDeposit)
+            {
+                gameControlScript.NotificationText("Can't place Gold Digger here! Place it on ore deposits.");
+                return;
+            }
             if(500 - gameControlScript.amountOfLand < tileScript.id && gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
             {
                 gameControlScript.money -= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost;
@@ -210,9 +230,8 @@ public void DestroyBuilding()
                 gameControlScript.currentSelectionId = -1;
             }
             else if(500 - gameControlScript.amountOfLand >= tileScript.id)
-            {
                 gameControlScript.NotificationText("Can't place here!");
-            }
+
             else if(gameControlScript.money < gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
             {
                 gameControlScript.NotificationText("Invalid funds!");
@@ -261,7 +280,6 @@ public void DestroyBuilding()
         buildingClone.transform.parent = targetTile.transform;
         buildingClone.GetComponent<BuildingScript>().building = new Building(targetBuilding);
     }
-
 
 
 }

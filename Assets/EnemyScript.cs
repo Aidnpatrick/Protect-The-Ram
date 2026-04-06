@@ -169,7 +169,6 @@ public class EnemyScript : MonoBehaviour
 
     public void Shoot()
     {
-        Debug.Log(gameObject + "Bam");
         rb.linearVelocity = Vector2.zero;
 
         GameObject target;

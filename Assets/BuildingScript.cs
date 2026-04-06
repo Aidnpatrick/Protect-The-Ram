@@ -34,11 +34,11 @@ public class BuildingScript : MonoBehaviour
             typeOfBuilding = 0;
         if(building.name.Contains("Camp")) 
             typeOfBuilding = 1;
-        if(building.name.Contains("Mine"))
+        if(building.name.Contains("Digger"))
         {
             typeOfBuilding = 2;
             if(transform.parent.name.Contains("Deposit"))
-                gameControlScript.amountOfMines++;            
+                gameControlScript.amountOfMines++;  
         }
     }
 
