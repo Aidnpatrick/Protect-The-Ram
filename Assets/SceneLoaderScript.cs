@@ -27,7 +27,7 @@ public class SceneLoaderScript : MonoBehaviour
 
     public void ChangePageNumUp()
     {
-        if(pageNum >= 5) return;
+        if(pageNum >= 6) return;
         pageNum++;
         tutorialImage.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Tutorial" + pageNum);
     }

@@ -245,28 +245,34 @@ public class GameControlScript : MonoBehaviour
         moneyMadeInRound = 0;
 
         float budget = 10 + numberOfRounds * 5;
-        if(numberOfRounds > 10) budget *= 1.8f;
-        if(numberOfRounds > 15) budget *= 2.5f;
-        if(numberOfRounds > 20) budget *= 3f;
+        budget *= numberOfRounds / 10 + 1;
+
 
         while (budget > 0)
         {
-            if (budget >= 8 && Random.value < 0.10f && numberOfRounds > 1)
+            if (budget >= 7 && Random.value < 0.10f && numberOfRounds > 2)
             {
                 GameObject cyberTruck = SpawnEnemy(RandomPos());
                 cyberTruck.name = "CyberTruck";
                 cyberTruck.GetComponent<SpriteRenderer>().sprite =
                     Resources.Load<Sprite>("Images/CyberTruck");
-                budget -= 5;
+                budget -= 7;
             }
-            else if(budget >= 4f && Random.value < 0.10f && numberOfRounds > 4)
+            else if(budget >= 5.5f && Random.value < 0.10f && numberOfRounds > 5)
             {
                 GameObject spawner = SpawnEnemy(RandomPos());
                 spawner.name = "EnemySpawner";
-                
                 spawner.GetComponent<SpriteRenderer>().sprite =
                 Resources.Load<Sprite>("Images/EnemySpawner");
-                budget -= 5;
+                budget -= 5.5f;
+            }
+            else if(budget >= 4.5f && Random.value < 0.10f && numberOfRounds > 1)
+            {
+                GameObject shield = SpawnEnemy(RandomPos());
+                shield.name = "EnemyShield";
+                shield.GetComponent<SpriteRenderer>().sprite =
+                Resources.Load<Sprite>("Images/EnemyShield");
+                budget -= 4.5f;
             }
             else
             {
@@ -275,7 +281,7 @@ public class GameControlScript : MonoBehaviour
             }
         }
         NotificationText("Round " + numberOfRounds + "\nEnemies coming!");
-        if(numberOfRounds == 2 || numberOfRounds == 5)
+        if(numberOfRounds == 3 || numberOfRounds == 5)
             NotificationText("A new enemy can now spawn!");
         isRoundDone = false;
     }

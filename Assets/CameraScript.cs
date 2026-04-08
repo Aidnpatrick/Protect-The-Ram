@@ -72,15 +72,14 @@ public class CameraScript : MonoBehaviour
         GameObject actualTarget = targetHit;
 
         if (targetHit.transform.parent == null && targetHit.transform.childCount > 0)
-        {
             actualTarget = targetHit.transform.GetChild(0).gameObject;
-        }
-        Debug.Log(actualTarget);
+
         if (actualTarget == null || actualTarget.GetComponent<BuildingScript>() == null)
         {
             if (actualTarget.GetComponent<TileScript>() == null)
             {
                 informationText.text = actualTarget.name.Replace("(Clone)", "");
+                hitMain = actualTarget.GetComponent<Collider2D>();
             }
             else
             {
@@ -89,7 +88,6 @@ public class CameraScript : MonoBehaviour
                 else informationText.text = "Emtpy Tile";
                 informationDestroyButton.gameObject.SetActive(true);
             }
-
         }
         else
         {
@@ -218,6 +216,7 @@ public void MakeMoreTroops()
 
         if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive && !isControllingTroops)
         {
+            
             if(gameDataBaseScript.buildings[gameControlScript.currentSelectionId].name.Contains("Gold") && !hit.GetComponent<TileScript>().oreDeposit)
             {
                 gameControlScript.NotificationText("Can't place Gold Digger here! Place it on ore deposits.");
@@ -238,22 +237,6 @@ public void MakeMoreTroops()
                 gameControlScript.currentSelectionId = -1;
             }
         }
-        /*
-        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive
-        && 500 - gameControlScript.amountOfLand < tileScript.id && !isControllingTroops && gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost) 
-        {
-            gameControlScript.money -= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost;
-            BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
-            gameControlScript.currentSelectionId = -1;
-        }
-        else if(Input.GetMouseButtonDown(0) && 500 - gameControlScript.amountOfLand >= tileScript.id)
-        {
-            gameControlScript.NotificationText("Can't place here!");
-        }
-        else if(gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
-        {
-        }
-        */
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
             Destroy(hit.transform.GetChild(0).gameObject);
@@ -269,7 +252,10 @@ public void MakeMoreTroops()
     void ControlTroopTarget()
     {
         foreach(GameObject troop in gameControlScript.troops)
-            troop.GetComponent<EnemyScript>().isControlled = true;
+        {
+            if(troop != null) troop.GetComponent<EnemyScript>().isControlled = true;
+        }
+
     }
 
     public void BuildingBuildOnTile(int targetId, GameObject targetTile)

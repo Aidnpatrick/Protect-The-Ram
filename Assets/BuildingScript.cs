@@ -16,6 +16,7 @@ public class BuildingScript : MonoBehaviour
 
     public bool isReloading = false;
     public float health;
+    public GameObject shotPrefab;
     void Start()
     {
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
@@ -104,6 +105,8 @@ public class BuildingScript : MonoBehaviour
         }
     }
 
+    
+
     void Shoot()
     {
         GameObject target = gameControlScript.FindNearestObject(
@@ -135,6 +138,7 @@ public class BuildingScript : MonoBehaviour
         
             brb.linearVelocity = bulletClone.transform.right * 20;
         ammo--;
+
         Destroy(bulletClone.gameObject, 4);
     }
     void OnDestroy()

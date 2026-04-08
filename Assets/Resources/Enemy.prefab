@@ -112,6 +112,7 @@ MonoBehaviour:
   cameraScript: {fileID: 0}
   childGameObject: {fileID: 0}
   bulletPrefab: {fileID: 413854545547773602, guid: 5ac9924803b2d3b41a80ff8a92d80a1f, type: 3}
+  shotPrefab: {fileID: 7040612199126720669, guid: 754ec45b9e582264fa632a2587c3069c, type: 3}
   spriteRenderer: {fileID: 0}
   childSpriteRenderer: {fileID: 0}
   rb: {fileID: 0}

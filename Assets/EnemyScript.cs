@@ -6,10 +6,14 @@ public class EnemyScript : MonoBehaviour
     public GameControlScript gameControlScript;
     public GameDataBaseScript gameDataBaseScript;
     public CameraScript cameraScript;
+
     public GameObject childGameObject;
-    public GameObject bulletPrefab;
+
+    public GameObject bulletPrefab, shotPrefab;
+
     public SpriteRenderer spriteRenderer, childSpriteRenderer;
     public Rigidbody2D rb, childRb;
+
     public float[] weights = {0,0};
     public float health = 100, speed = 1.8f;
     public float hitCooldown = 0, shotCooldown;
@@ -46,8 +50,8 @@ public class EnemyScript : MonoBehaviour
         if(name.Contains("CyberTruck"))
         {
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
-            speed = 3.5f;
-            health = 280;
+            speed = 3.7f;
+            health = 350;
             GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
         }
@@ -59,21 +63,27 @@ public class EnemyScript : MonoBehaviour
             StartCoroutine(spawnEnemySpawner());
             Destroy(transform.GetChild(0).gameObject);
         }
+        if(name.Contains("Shield"))
+        {
+            speed = 2.1f;
+            health *= 1.2f;
+            transform.localScale += new Vector3(0.1f,0.1f,0);
+            Destroy(transform.GetChild(0).gameObject);
+        }
         transform.Rotate(0,0,Random.Range(0,360));
     }
     IEnumerator spawnEnemySpawner()
     {
         while(true)
         {
-            Debug.Log("asdsad");
             for(int i = 0; i < 3; i++)
             {
                 GameObject smallEnemyClone = gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f,0.6f), Random.Range(-0.5f,0.6f), 0));
                 smallEnemyClone.transform.localScale = new Vector3(0.35f, 0.35f, 1);
                 EnemyScript smallEs = smallEnemyClone.GetComponent<EnemyScript>();
-                smallEs.health = 60;
+                smallEs.health = 20;
             }
-            yield return new WaitForSeconds(8f);
+            yield return new WaitForSeconds(6f);
         }
     }
     void Update()
@@ -216,6 +226,8 @@ public class EnemyScript : MonoBehaviour
 
         if(bulletClone.GetComponent<SpriteRenderer>().sprite) {}
         Destroy(bulletClone.gameObject, 4);
+
+        
         //rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
     
@@ -258,6 +270,25 @@ public class EnemyScript : MonoBehaviour
             if(originArmyCamp != null)
                 originArmyCamp.GetComponent<BuildingScript>().numOfTroops--;
         }
+        if(name.Contains("Enemy"))
+        {
+            if(transform.localScale.x == 0.5)
+            {
+                gameControlScript.money += 6;
+                gameControlScript.moneyMadeInRound += 6;               
+            }
+            else
+            {
+                gameControlScript.money += 1;
+                gameControlScript.moneyMadeInRound += 1;     
+            }
+
+        }
+        if(name.Contains("Shield"))
+        {
+            gameControlScript.money += 6;
+            gameControlScript.moneyMadeInRound += 6;
+        }        
     }
 
 
@@ -270,11 +301,12 @@ public class EnemyScript : MonoBehaviour
             {
                 if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "").Replace("Turret", "")))
                 {
+                    if(name.Contains("Shield"))
+                    health -= currentBuilding.damage / 10;
+                    else 
                     health -= currentBuilding.damage / 2;
                     if (health <= 0)
                     {                        
-                        gameControlScript.money += 6;
-                        gameControlScript.moneyMadeInRound += 6;
                         Destroy(gameObject);
                     }
                     return;
@@ -293,8 +325,10 @@ public class EnemyScript : MonoBehaviour
         if(collision.name.Contains("Bullet") && collision.name.Contains("Troop") && (name.Contains("Enemy") || name.Contains("CyberTruck")))
         {
             Destroy(collision.gameObject);
-            
-            health -= 5;
+
+            if(name.Contains("Shield")) health -= 2;
+            else health -= 5;
+
             if(health <= 0)
                 Destroy(gameObject);
         }
