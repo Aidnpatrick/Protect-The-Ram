@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class GameControlScript : MonoBehaviour
@@ -15,7 +16,7 @@ public class GameControlScript : MonoBehaviour
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText, gameStatText;
-    public GameObject scrollSelectionContainer, informationText, controlTroopText;
+    public GameObject scrollSelectionContainer, informationText, controlTroopText, settingCanvasMainText, settingCanvasStatsText;
 
 
     //prefab
@@ -26,20 +27,20 @@ public class GameControlScript : MonoBehaviour
 
 
     //libraries
-    public GameObject[] enemies, turrets, troops, tiles;
+    public GameObject[] enemies, turrets, troops, tiles, rams;
     public int amountOfMines = 0;
     public List<int> depositLocations = new List<int>();
-    public Dictionary<GameObject, float> ramTracking = new Dictionary<GameObject, float>();
 
 
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
-    public int money = 0, numberOfRounds = 0, amountOfLand = 30, moneyMadeInRound = 0;
+    public int money = 0, numberOfRounds = 0, amountOfLand = 30, moneyMadeInRound = 0, score = 0;
     public bool isTABactive = true, isSettingsActive = false, isGameCanvasActive = false;
 
 
     void Start()
     {
+        score = 0;
         isSettingsActive = false;
         isTABactive = true;
         isGameCanvasActive = true;
@@ -53,8 +54,14 @@ public class GameControlScript : MonoBehaviour
         amountOfMines = 0;
 
         notificationContainer.SetActive(true);
+        settingCanvasStatsText.SetActive(false);
+        settingCanvasMainText.GetComponent<TMP_Text>().text = "Settings"; 
 
         NotificationText("Game Loaded!");
+
+        depositLocations.Clear();
+
+        depositLocations.Add(496);
 
         for(int i = 0; i < 10; i++)
         {
@@ -88,18 +95,19 @@ public class GameControlScript : MonoBehaviour
         UpdateArrays();
         GameObject ram = BuildOnTileMisc(ramPrefab, 495);
 
-        if (ram != null)
-        {
-            ramTracking.Add(ram, 100);
-        }
         SpawnInGroups(weedPrefab, 70);
         //StartCoroutine(e());
+        StartCoroutine(e());
     }
 
     IEnumerator e()
     {
-        SpawnEnemy(RandomPos());
-        yield return new WaitForSeconds(1f);
+        while (true)
+        {   
+            SpawnEnemy(RandomPos());
+            yield return new WaitForSeconds(5f);
+
+        }
     }
     void Update()
     {
@@ -227,6 +235,7 @@ public class GameControlScript : MonoBehaviour
         turrets = GameObject.FindGameObjectsWithTag("Buildings");
         troops = GameObject.FindGameObjectsWithTag("Troop");
         tiles = GameObject.FindGameObjectsWithTag("Tile");
+        rams = GameObject.FindGameObjectsWithTag("Ram");
     }
     public void SpawnInGroups(GameObject child, int numberOfChilds)
     {
@@ -245,18 +254,25 @@ public class GameControlScript : MonoBehaviour
         moneyMadeInRound = 0;
 
         float budget = 10 + numberOfRounds * 5;
-        budget *= numberOfRounds / 10 + 1;
+        budget *= numberOfRounds / 15f + 1;
 
 
         while (budget > 0)
         {
-            if (budget >= 7 && Random.value < 0.10f && numberOfRounds > 2)
+            if(budget >= 10 && Random.value < 0.1f && numberOfRounds > 2)
+            {
+                GameObject big = SpawnEnemy(RandomPos());
+                big.name = "EnemyBig";
+                big.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/EnemyBig");
+                budget -= 10;
+            }
+            else if (budget >= 8 && Random.value < 0.08f && numberOfRounds > 2)
             {
                 GameObject cyberTruck = SpawnEnemy(RandomPos());
                 cyberTruck.name = "CyberTruck";
                 cyberTruck.GetComponent<SpriteRenderer>().sprite =
                     Resources.Load<Sprite>("Images/CyberTruck");
-                budget -= 7;
+                budget -= 8;
             }
             else if(budget >= 5.5f && Random.value < 0.10f && numberOfRounds > 5)
             {
@@ -280,9 +296,9 @@ public class GameControlScript : MonoBehaviour
                 budget -= 1;
             }
         }
+
         NotificationText("Round " + numberOfRounds + "\nEnemies coming!");
-        if(numberOfRounds == 3 || numberOfRounds == 5)
-            NotificationText("A new enemy can now spawn!");
+
         isRoundDone = false;
     }
     
@@ -298,6 +314,7 @@ public class GameControlScript : MonoBehaviour
             NotificationText("Money produced from Gold Mines: + $" + amountOfMines * 90);
         money += 50;
         NotificationText("Bonus: + $50");
+        score += moneyMadeInRound;
 
         roundButton.SetActive(true);
         foreach(GameObject enemy in enemies)
@@ -311,11 +328,7 @@ public class GameControlScript : MonoBehaviour
         }
         foreach(GameObject troop in troops)
             Destroy(troop);
-
-        if(Random.Range(0,7) < 1f)
-        {
-            
-        }
+        
     }
     Vector3 RandomPos()
     {
@@ -373,5 +386,13 @@ public class GameControlScript : MonoBehaviour
         troopClone.name = "Troop";
     }
 
+    public void GameOver()
+    {
+        isSettingsActive = true;
+        isGameCanvasActive = false;
+        settingCanvasMainText.GetComponent<TMP_Text>().text = "Game Over!";
+        settingCanvasStatsText.SetActive(true);
+        settingCanvasStatsText.transform.GetChild(1).GetComponent<TMP_Text>().text = "Score: " + score + "\nRounds Defended: " + numberOfRounds;
+    }
 
 }

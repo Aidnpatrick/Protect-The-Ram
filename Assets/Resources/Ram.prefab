@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 4395900307439431955}
   - component: {fileID: 4160722174932627693}
   - component: {fileID: 5526735634266324963}
+  - component: {fileID: 502255332324767062}
   m_Layer: 0
   m_Name: Ram
-  m_TagString: Untagged
+  m_TagString: Ram
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -185,3 +186,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &502255332324767062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102331153093008306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15681350c98ebfc43a767fe1a7d1aa22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  health: 0

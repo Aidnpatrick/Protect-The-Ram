@@ -80,13 +80,14 @@ public class CameraScript : MonoBehaviour
             {
                 informationText.text = actualTarget.name.Replace("(Clone)", "");
                 hitMain = actualTarget.GetComponent<Collider2D>();
+                informationDestroyButton.gameObject.SetActive(true);
             }
             else
             {
                 if(targetHit.GetComponent<TileScript>().oreDeposit)
                 informationText.text = "Empty Ore Deposit";
                 else informationText.text = "Emtpy Tile";
-                informationDestroyButton.gameObject.SetActive(true);
+                informationDestroyButton.gameObject.SetActive(false);
             }
         }
         else
@@ -126,6 +127,7 @@ public void MakeMoreTroops()
         {
             Destroy(hitMain.gameObject);
         }
+        isInformationBoxActive = false;
     }
     void Update()
     {
@@ -161,10 +163,7 @@ public void MakeMoreTroops()
                 UpdateInformationBoxSelection(gameDataBaseScript.buildings[index], selectionContainerIndex.GetComponent<RectTransform>().anchoredPosition);
 
                 isSelectionInformationBoxActive = true;
-
-                
                 break;
-
             }
             else
             {

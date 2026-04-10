@@ -8,6 +8,7 @@ TagManager:
   - Buildings
   - Troop
   - Tile
+  - Ram
   layers:
   - Default
   - TransparentFX

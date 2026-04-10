@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
 {
-    public GameControlScript gameControlScript;
-    public GameDataBaseScript gameDataBaseScript;
-    public CameraScript cameraScript;
+    private GameControlScript gameControlScript;
+    private GameDataBaseScript gameDataBaseScript;
+    private CameraScript cameraScript;
 
     public GameObject childGameObject;
 
@@ -70,6 +70,12 @@ public class EnemyScript : MonoBehaviour
             transform.localScale += new Vector3(0.1f,0.1f,0);
             Destroy(transform.GetChild(0).gameObject);
         }
+        if(name.Contains("Big"))
+        {
+            health *= 10;
+            transform.localScale +=  new Vector3(0.3f, 0.3f,0);
+            Destroy(transform.GetChild(0).gameObject);
+        }
         transform.Rotate(0,0,Random.Range(0,360));
     }
     IEnumerator spawnEnemySpawner()
@@ -94,7 +100,8 @@ public class EnemyScript : MonoBehaviour
         //if(name.Contains("CyberTruck")) target = wayPoint;
         closestTroop = gameControlScript.FindNearestObject(gameControlScript.troops, 50, gameObject);
         closestTurret = gameControlScript.FindNearestObject(gameControlScript.turrets, 50, gameObject);
-        GameObject ram = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
+        GameObject ram = gameControlScript.FindNearestObject(gameControlScript.rams, Mathf.Infinity, gameObject);
+
 
         if (name.Contains("Enemy"))
         {
@@ -128,16 +135,35 @@ public class EnemyScript : MonoBehaviour
         if (target != null)
         {
 
-            if((childGameObject != null || name.Contains("Spawner")) && Vector3.Distance(target.transform.position, transform.position) < 8 && shotCooldown <= 0)
+            if((childGameObject != null || name.Contains("Spawner") || name.Contains("Big")) && Vector3.Distance(target.transform.position, transform.position) < 8)
             {
-                Shoot();
-                shotCooldown = 1;
+                if (name.Contains("Big"))
+                {
+                    spriteRenderer.sprite = Resources.Load<Sprite>("Images/EnemyBigShoot");
+
+                }
+                if(shotCooldown <= 0)
+                {
+                    Shoot();
+                    if(name.Contains("Big"))
+                    {
+                        for(int i = 0; i < 5; i++)
+                            Shoot();
+                    }
+                    shotCooldown = 1;
+                }
             }
+            else
+            {
+                if(name.Contains("Big"))
+                spriteRenderer.sprite = Resources.Load<Sprite>("Images/EnemyBig");
+            }
+            
             if(isControlled)
                 MoveTowards(target.transform.position);
-            else if((childGameObject != null || name.Contains("Spawner")) && Vector3.Distance(target.transform.position, transform.position) > 8)
+            else if((childGameObject != null || name.Contains("Spawner") || name.Contains("Big")) && Vector3.Distance(target.transform.position, transform.position) > 8)
                 MoveTowards(target.transform.position);
-            else if(childGameObject == null && !name.Contains("Spawner"))
+            else if(childGameObject == null && !name.Contains("Spawner") && !name.Contains("Big"))
                 MoveTowards(target.transform.position);
         }
         else if(target == null)
@@ -196,8 +222,8 @@ public class EnemyScript : MonoBehaviour
                 
             }
         }
-        if(target == null && (name.Contains("Enemy") || name.Contains("Spawner"))) //whatever
-            target = gameControlScript.FindNearestObjectDictionary(gameControlScript.ramTracking, Mathf.Infinity, gameObject);
+        if(target == null && (name.Contains("Enemy") || name.Contains("Spawner"))) //ram
+            target = gameControlScript.FindNearestObject(gameControlScript.rams, Mathf.Infinity, gameObject);
 
         if(target == null)
         {
@@ -282,7 +308,6 @@ public class EnemyScript : MonoBehaviour
                 gameControlScript.money += 1;
                 gameControlScript.moneyMadeInRound += 1;     
             }
-
         }
         if(name.Contains("Shield"))
         {
