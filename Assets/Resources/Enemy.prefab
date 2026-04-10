@@ -107,12 +107,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f37daa333deca3542b2a5cd2a81d255c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  gameControlScript: {fileID: 0}
-  gameDataBaseScript: {fileID: 0}
-  cameraScript: {fileID: 0}
   childGameObject: {fileID: 0}
   bulletPrefab: {fileID: 413854545547773602, guid: 5ac9924803b2d3b41a80ff8a92d80a1f, type: 3}
-  shotPrefab: {fileID: 7040612199126720669, guid: 754ec45b9e582264fa632a2587c3069c, type: 3}
+  hitPrefab: {fileID: 1107376504051969498, guid: 74ef9879ba241d5459b6566ca498dfcf, type: 3}
   spriteRenderer: {fileID: 0}
   childSpriteRenderer: {fileID: 0}
   rb: {fileID: 0}

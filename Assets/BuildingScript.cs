@@ -5,7 +5,7 @@ public class BuildingScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public Building building;
-    public GameObject bulletPrefab, troopPrefab, gunPrefab;
+    public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab;
     public GameObject reloadSmokeParticle;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
@@ -169,6 +169,7 @@ public class BuildingScript : MonoBehaviour
     {
         if(collision.name.Contains("Bullet") && collision.name.Contains("Enemy"))
         {
+            Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
             Destroy(collision.gameObject);
             health -= 5;
         }

@@ -24,9 +24,11 @@ public class RamScript : MonoBehaviour
     {
         if (collision.name.Contains("Bullet") && collision.name.Contains("Enemy"))
         {
+            
             Destroy(collision.gameObject);
             health -= 10;
         }
+
         if(collision.name.Contains("Cyber"))
         {
             Destroy(collision.gameObject);

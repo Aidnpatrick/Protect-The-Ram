@@ -79,6 +79,9 @@ public class CameraScript : MonoBehaviour
             if (actualTarget.GetComponent<TileScript>() == null)
             {
                 informationText.text = actualTarget.name.Replace("(Clone)", "");
+                if(actualTarget.name.Contains("Ram"))
+                    informationText.text += actualTarget.GetComponent<RamScript>().health  + "HP\n";
+                    
                 hitMain = actualTarget.GetComponent<Collider2D>();
                 informationDestroyButton.gameObject.SetActive(true);
             }

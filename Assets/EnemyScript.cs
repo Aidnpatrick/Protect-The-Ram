@@ -9,7 +9,7 @@ public class EnemyScript : MonoBehaviour
 
     public GameObject childGameObject;
 
-    public GameObject bulletPrefab, shotPrefab;
+    public GameObject bulletPrefab, hitPrefab;
 
     public SpriteRenderer spriteRenderer, childSpriteRenderer;
     public Rigidbody2D rb, childRb;
@@ -282,7 +282,9 @@ public class EnemyScript : MonoBehaviour
     {
         if (name.Contains("CyberTruck"))
         {
-            
+            GameObject hitClone = Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            hitClone.transform.localScale += new Vector3(0.1f, 0.1f, 0);
+            Destroy(hitClone, 0.1f);
             gameControlScript.money += 10;
             gameControlScript.moneyMadeInRound += 10;
             for(int i = 0; i < 5; i++)
@@ -330,6 +332,9 @@ public class EnemyScript : MonoBehaviour
                     health -= currentBuilding.damage / 10;
                     else 
                     health -= currentBuilding.damage / 2;
+                    
+                    Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
+
                     if (health <= 0)
                     {                        
                         Destroy(gameObject);
@@ -345,6 +350,9 @@ public class EnemyScript : MonoBehaviour
             health -= 5;
             if(health <= 0)
                 Destroy(gameObject);
+            
+            
+            Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
         }
 
         if(collision.name.Contains("Bullet") && collision.name.Contains("Troop") && (name.Contains("Enemy") || name.Contains("CyberTruck")))
@@ -353,6 +361,8 @@ public class EnemyScript : MonoBehaviour
 
             if(name.Contains("Shield")) health -= 2;
             else health -= 5;
+            
+            Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
 
             if(health <= 0)
                 Destroy(gameObject);
