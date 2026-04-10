@@ -97,7 +97,6 @@ public class GameControlScript : MonoBehaviour
 
         SpawnInGroups(weedPrefab, 70);
         //StartCoroutine(e());
-        StartCoroutine(e());
     }
 
     IEnumerator e()
@@ -154,6 +153,7 @@ public class GameControlScript : MonoBehaviour
         if(Random.Range(0,10) <= 100f)
         {
             GameObject gunClone = Instantiate(gunPrefab, enemyClone.transform.position, Quaternion.identity, enemyClone.transform);
+            gunClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/EnemyGun");
             gunClone.GetComponent<SpriteRenderer>().flipY = false;
         }
         return enemyClone;

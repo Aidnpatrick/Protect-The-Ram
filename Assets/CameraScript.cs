@@ -81,7 +81,7 @@ public class CameraScript : MonoBehaviour
                 informationText.text = actualTarget.name.Replace("(Clone)", "");
                 if(actualTarget.name.Contains("Ram"))
                     informationText.text += actualTarget.GetComponent<RamScript>().health  + "HP\n";
-                    
+
                 hitMain = actualTarget.GetComponent<Collider2D>();
                 informationDestroyButton.gameObject.SetActive(true);
             }
@@ -137,10 +137,12 @@ public void MakeMoreTroops()
 
         Keyboard keyboard = Keyboard.current;
 
-        if (keyboard.tKey.isPressed && camera.orthographicSize >= 1f)
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        
+        if ((keyboard.tKey.isPressed || scroll > 0) && camera.orthographicSize >= 1f)
             camera.orthographicSize -= 0.05f;
 
-        if(keyboard.yKey.isPressed && camera.orthographicSize <= 10)
+        if((keyboard.yKey.isPressed || scroll < 0 ) && camera.orthographicSize <= 10)
             camera.orthographicSize += 0.05f;
 
         if(keyboard.gKey.isPressed)

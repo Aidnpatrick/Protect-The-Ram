@@ -169,7 +169,8 @@ public class BuildingScript : MonoBehaviour
     {
         if(collision.name.Contains("Bullet") && collision.name.Contains("Enemy"))
         {
-            Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
+            GameObject hitClone = Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            Destroy(hitClone, 0.1f);
             Destroy(collision.gameObject);
             health -= 5;
         }

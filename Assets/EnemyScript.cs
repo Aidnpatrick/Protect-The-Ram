@@ -244,8 +244,16 @@ public class EnemyScript : MonoBehaviour
 
         bulletClone.transform.Rotate(0, 0, Random.Range(-10f, 11f));
 
-
         bulletClone.name = "Bullet" + name;
+        if(name.Contains("Enemy"))
+        {
+            bulletClone.GetComponent<SpriteRenderer>().color = Color.white;
+            bulletClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/EnemyBullet");
+            if (name.Contains("Spawner"))
+            {
+                bulletClone.transform.localScale += new Vector3(0.1f,0.1f,0);
+            }
+        }
 
         Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
         brb.linearVelocity = bulletClone.transform.right * 20;
