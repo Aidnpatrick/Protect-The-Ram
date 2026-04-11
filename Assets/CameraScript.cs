@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using Unity.VisualScripting;
 
 public class CameraScript : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class CameraScript : MonoBehaviour
     public GameDataBaseScript gameDataBaseScript;
     public Camera camera;
     public Canvas gameCanvas;
-    public GameObject player;
+    public GameObject player, crossChair;
     public GameObject informationBox, selectionInformationBox;
 
     public GameObject notificationContainer;
@@ -80,7 +81,7 @@ public class CameraScript : MonoBehaviour
             {
                 informationText.text = actualTarget.name.Replace("(Clone)", "");
                 if(actualTarget.name.Contains("Ram"))
-                    informationText.text += actualTarget.GetComponent<RamScript>().health  + "HP\n";
+                    informationText.text += "\n" + actualTarget.GetComponent<RamScript>().health  + "HP\n";
 
                 hitMain = actualTarget.GetComponent<Collider2D>();
                 informationDestroyButton.gameObject.SetActive(true);
@@ -128,6 +129,10 @@ public void MakeMoreTroops()
     {
         if (hitMain != null && !hitMain.name.Contains("Ram"))
         {
+            if(hitMain.tag == "Building")
+            {
+                gameControlScript.money += gameDataBaseScript.FindBuildingClassById(hitMain.GetComponent<BuildingScript>().building.id).cost / 2;
+            }
             Destroy(hitMain.gameObject);
         }
         isInformationBoxActive = false;
@@ -193,6 +198,17 @@ public void MakeMoreTroops()
         
 
         if(!canEdit) return;
+
+        if(hit != null && ((hit.transform.parent != null && hit.transform.parent.name.Contains("Tile")) || hit.name.Contains("Tile")))
+        {
+            crossChair.transform.position = hit.transform.position;
+            crossChair.SetActive(true);
+        }
+        else
+        {
+            crossChair.SetActive(false);
+        }
+
         // children on tile
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame && !hit.transform.name.Contains("Ram"))
         {

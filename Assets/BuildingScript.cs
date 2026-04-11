@@ -1,11 +1,12 @@
 using System.Collections;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public Building building;
-    public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab;
+    public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab, explosionPrefab;
     public GameObject reloadSmokeParticle;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
@@ -19,6 +20,16 @@ public class BuildingScript : MonoBehaviour
     public GameObject shotPrefab;
     void Start()
     {
+        if (!name.Contains("Boogie"))
+        {
+            tag = "Buildings";
+        }
+        else
+        {
+            tag = "Untagged";
+            GetComponent<CircleCollider2D>().radius = 1f;
+            transform.localScale -= new Vector3(0.2f,0.2f,0f);
+        }
         gameControlScript = GameObject.Find("GameControl").GetComponent<GameControlScript>();
         if(building == null)
             return;
@@ -40,6 +51,10 @@ public class BuildingScript : MonoBehaviour
             typeOfBuilding = 2;
             if(transform.parent.name.Contains("Deposit"))
                 gameControlScript.amountOfMines++;  
+        }
+        if (building.name.Contains("Mine"))
+        {
+            typeOfBuilding = 3;
         }
     }
 
@@ -132,22 +147,21 @@ public class BuildingScript : MonoBehaviour
         bulletClone.transform.Rotate(0, 0, Random.Range(-building.recoil, building.recoil+1));
 
         bulletClone.name = "Bullet" + building.name;
-        
 
         Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
         
             brb.linearVelocity = bulletClone.transform.right * 20;
         ammo--;
-
         Destroy(bulletClone.gameObject, 4);
     }
     void OnDestroy()
     {
-        gameControlScript.money += building.cost / 2;
+        gameControlScript.money += building.cost / 4;
 
         if(typeOfBuilding == 2 && transform.parent.name.Contains("Deposit"))
             gameControlScript.amountOfMines--;
         
+
     }
     void SpawnTroop()
     {
@@ -167,12 +181,21 @@ public class BuildingScript : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.name.Contains("Bullet") && collision.name.Contains("Enemy"))
+        if(collision.name.Contains("Bullet") && collision.name.Contains("Enemy") && tag == "Buildings")
         {
             GameObject hitClone = Instantiate(hitPrefab, transform.position, Quaternion.identity);
             Destroy(hitClone, 0.1f);
             Destroy(collision.gameObject);
             health -= 5;
+        }
+        if(collision.tag == "Enemy" && name.Contains("Boogie"))
+        {
+            Debug.Log("BOOOOOMMM");
+            GameObject explosionClone = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            explosionClone.name = "BoogieExplosion";
+            Destroy(explosionClone, 0.35f);
+
+            Destroy(gameObject);
         }
     }
 }

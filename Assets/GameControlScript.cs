@@ -259,28 +259,28 @@ public class GameControlScript : MonoBehaviour
 
         while (budget > 0)
         {
-            if(budget >= 10 && Random.value < 0.1f && numberOfRounds > 2)
+            if(budget >= 7 && Random.value < 0.1f && numberOfRounds > 2)
             {
                 GameObject big = SpawnEnemy(RandomPos());
                 big.name = "EnemyBig";
                 big.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/EnemyBig");
                 budget -= 10;
             }
-            else if (budget >= 8 && Random.value < 0.08f && numberOfRounds > 2)
+            else if (budget >= 9 && Random.value < 0.08f && numberOfRounds > 2)
             {
                 GameObject cyberTruck = SpawnEnemy(RandomPos());
                 cyberTruck.name = "CyberTruck";
                 cyberTruck.GetComponent<SpriteRenderer>().sprite =
                     Resources.Load<Sprite>("Images/CyberTruck");
-                budget -= 8;
+                budget -= 9;
             }
-            else if(budget >= 5.5f && Random.value < 0.10f && numberOfRounds > 5)
+            else if(budget >= 7.5f && Random.value < 0.10f && numberOfRounds > 5)
             {
                 GameObject spawner = SpawnEnemy(RandomPos());
                 spawner.name = "EnemySpawner";
                 spawner.GetComponent<SpriteRenderer>().sprite =
                 Resources.Load<Sprite>("Images/EnemySpawner");
-                budget -= 5.5f;
+                budget -= 7.5f;
             }
             else if(budget >= 4.5f && Random.value < 0.10f && numberOfRounds > 1)
             {

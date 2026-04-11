@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -19,10 +20,11 @@ public class EnemyScript : MonoBehaviour
     public float hitCooldown = 0, shotCooldown;
     public GameObject targetMain, wayPoint = null, originArmyCamp;
     public GameObject closestTroop, closestTurret;
-    public bool isControlled;
+    public bool isControlled, isStunned = false, whichWayDancing = false;
     void Start()
     {
         isControlled = false;
+        isStunned = false;
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         gameControlScript = GameObject.Find("GameControl").
@@ -142,7 +144,7 @@ public class EnemyScript : MonoBehaviour
                     spriteRenderer.sprite = Resources.Load<Sprite>("Images/EnemyBigShoot");
 
                 }
-                if(shotCooldown <= 0)
+                if(shotCooldown <= 0 && !isStunned)
                 {
                     Shoot();
                     if(name.Contains("Big"))
@@ -156,34 +158,26 @@ public class EnemyScript : MonoBehaviour
             else
             {
                 if(name.Contains("Big"))
-                spriteRenderer.sprite = Resources.Load<Sprite>("Images/EnemyBig");
+                    spriteRenderer.sprite = Resources.Load<Sprite>("Images/EnemyBig");
             }
             
-            if(isControlled)
+            if(isControlled && !isStunned)
                 MoveTowards(target.transform.position);
-            else if((childGameObject != null || name.Contains("Spawner") || name.Contains("Big")) && Vector3.Distance(target.transform.position, transform.position) > 8)
+            else if((childGameObject != null || name.Contains("Spawner") || name.Contains("Big")) && Vector3.Distance(target.transform.position, transform.position) > 8 && !isStunned)
                 MoveTowards(target.transform.position);
-            else if(childGameObject == null && !name.Contains("Spawner") && !name.Contains("Big"))
+            else if(childGameObject == null && !name.Contains("Spawner") && !name.Contains("Big") && !isStunned)
                 MoveTowards(target.transform.position);
         }
         else if(target == null)
         {
-            
             rb.linearVelocity = Vector2.zero;
         }
-        /*
-        float zRotation = transform.eulerAngles.z;
 
-        if (zRotation > 180) zRotation -= 360;
-        spriteRenderer.flipX = zRotation > 90 || zRotation < -90;
-        if(name.Contains("Troop"))        
-            spriteRenderer.flipX = !(zRotation > 90 || zRotation < -90);
-
-        if(childGameObject != null)
+        if(isStunned)
         {
-            childSpriteRenderer.flipX = spriteRenderer.flipX;
+            transform.Rotate(new Vector3(0,0,whichWayDancing ? 200 : -200) * Time.deltaTime);
         }
-        */
+
         targetMain = target;
         UpdateSpriteFacing();    
     }
@@ -205,6 +199,7 @@ public class EnemyScript : MonoBehaviour
 
     public void Shoot()
     {
+        if(isStunned) return;
         rb.linearVelocity = Vector2.zero;
 
         GameObject target;
@@ -224,6 +219,9 @@ public class EnemyScript : MonoBehaviour
         }
         if(target == null && (name.Contains("Enemy") || name.Contains("Spawner"))) //ram
             target = gameControlScript.FindNearestObject(gameControlScript.rams, Mathf.Infinity, gameObject);
+
+        if(isStunned) 
+            target = null;
 
         if(target == null)
         {
@@ -259,7 +257,7 @@ public class EnemyScript : MonoBehaviour
         brb.linearVelocity = bulletClone.transform.right * 20;
 
         if(bulletClone.GetComponent<SpriteRenderer>().sprite) {}
-        Destroy(bulletClone.gameObject, 4);
+        Destroy(bulletClone.gameObject, 0.45f);
 
         
         //rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -284,6 +282,13 @@ public class EnemyScript : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rb.MoveRotation(angle);
         rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+    }
+    public IEnumerator StunDuration(float duration)
+    {
+        whichWayDancing = Random.Range(0f,1f) < 0.5f ? false : true;
+        isStunned = true;
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
     }
 
     void OnDestroy()
@@ -310,8 +315,8 @@ public class EnemyScript : MonoBehaviour
         {
             if(transform.localScale.x == 0.5)
             {
-                gameControlScript.money += 6;
-                gameControlScript.moneyMadeInRound += 6;               
+                gameControlScript.money += 9;
+                gameControlScript.moneyMadeInRound += 9;               
             }
             else
             {
@@ -321,8 +326,8 @@ public class EnemyScript : MonoBehaviour
         }
         if(name.Contains("Shield"))
         {
-            gameControlScript.money += 6;
-            gameControlScript.moneyMadeInRound += 6;
+            gameControlScript.money += 10;
+            gameControlScript.moneyMadeInRound += 10;
         }        
     }
 
@@ -387,36 +392,12 @@ public class EnemyScript : MonoBehaviour
         if((collision.name.Contains("Troop") || collision.name.Contains("Enemy")) && name.Contains("CyberTruck"))
             Destroy(collision.gameObject);
         
-    }
-    /*
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        
-        if(collision.name.Contains("Enemy") && name.Contains("Troop") && hitCooldown <= 0)
+        if(collision.name.Contains("Explosion") && tag.Contains("Enemy"))
         {
-            health -= 10;
-            hitCooldown = 1;
-            if (health <= 0)
-                Destroy(gameObject);
+            health -= 25;
+            if(health <= 0)
+            StartCoroutine(StunDuration(5));
         }
-        if(collision.name.Contains("Troop") && name.Contains("Enemy")&& hitCooldown <= 0) {
-            health -= 5;
-            hitCooldown = 1;
-            if (health <= 0)
-            {
-                gameControlScript.money += 5;
-                Destroy(gameObject);
-            }
-        }
-
-
-        if(collision.CompareTag("Buildings") && name.Contains("Enemy")&& hitCooldown <= 0)
-        {
-            collision.GetComponent<BuildingScript>().health -= 10;
-            hitCooldown = 1;
-        }
-        if(collision.name.Contains("Ram"))
-            gameControlScript.ramTracking[collision.gameObject] -= 10;
     }
-    */
+    
 }
