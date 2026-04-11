@@ -53,7 +53,7 @@ public class EnemyScript : MonoBehaviour
         {
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
             speed = 3.7f;
-            health = 350;
+            health = 400;
             GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
         }
@@ -68,7 +68,7 @@ public class EnemyScript : MonoBehaviour
         if(name.Contains("Shield"))
         {
             speed = 2.1f;
-            health *= 1.2f;
+            health *= 3.5f;
             transform.localScale += new Vector3(0.1f,0.1f,0);
             Destroy(transform.GetChild(0).gameObject);
         }
@@ -341,9 +341,6 @@ public class EnemyScript : MonoBehaviour
             {
                 if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "").Replace("Turret", "")))
                 {
-                    if(name.Contains("Shield"))
-                    health -= currentBuilding.damage / 10;
-                    else 
                     health -= currentBuilding.damage / 2;
                     
                     Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);

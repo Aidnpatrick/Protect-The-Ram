@@ -254,7 +254,7 @@ public class GameControlScript : MonoBehaviour
         moneyMadeInRound = 0;
 
         float budget = 10 + numberOfRounds * 5;
-        budget *= numberOfRounds / 15f + 1;
+        budget *= numberOfRounds / 15.5f + 1;
 
 
         while (budget > 0)
@@ -274,13 +274,13 @@ public class GameControlScript : MonoBehaviour
                     Resources.Load<Sprite>("Images/CyberTruck");
                 budget -= 9;
             }
-            else if(budget >= 7.5f && Random.value < 0.10f && numberOfRounds > 5)
+            else if(budget >= 9f && Random.value < 0.10f && numberOfRounds > 5)
             {
                 GameObject spawner = SpawnEnemy(RandomPos());
                 spawner.name = "EnemySpawner";
                 spawner.GetComponent<SpriteRenderer>().sprite =
                 Resources.Load<Sprite>("Images/EnemySpawner");
-                budget -= 7.5f;
+                budget -= 9f;
             }
             else if(budget >= 4.5f && Random.value < 0.10f && numberOfRounds > 1)
             {
