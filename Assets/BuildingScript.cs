@@ -123,11 +123,13 @@ public class BuildingScript : MonoBehaviour
 
     void Shoot()
     {
+        
         GameObject target = gameControlScript.FindNearestObject(
             gameControlScript.enemies,
             building.range,
             gameObject
         );
+
 
         if(target == null) return;
 
@@ -151,6 +153,11 @@ public class BuildingScript : MonoBehaviour
         
             brb.linearVelocity = bulletClone.transform.right * 20;
         ammo--;
+
+        if(name.Contains("Poison"))
+        {
+            bulletClone.GetComponent<SpriteRenderer>().color = Color.green;
+        }
         Destroy(bulletClone.gameObject, 4);
     }
     void OnDestroy()
@@ -189,7 +196,6 @@ public class BuildingScript : MonoBehaviour
         }
         if(collision.tag == "Enemy" && name.Contains("Boogie"))
         {
-            Debug.Log("BOOOOOMMM");
             GameObject explosionClone = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             explosionClone.name = "BoogieExplosion";
             Destroy(explosionClone, 0.35f);

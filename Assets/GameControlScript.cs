@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class GameControlScript : MonoBehaviour
@@ -76,7 +77,7 @@ public class GameControlScript : MonoBehaviour
             {
                 GameObject tileClone = Instantiate(tilePrefab, new Vector3(i, j, 0), Quaternion.identity);
                 tileClone.GetComponent<TileScript>().id = index;
-                if(depositLocations.Contains(index)) 
+                if(depositLocations.Contains(index) && tileClone.transform.childCount == 0) 
                 {
                     tileClone.name += " Deposit";
                     tileClone.GetComponent<TileScript>().oreDeposit = true;
@@ -298,7 +299,6 @@ public class GameControlScript : MonoBehaviour
         }
 
         NotificationText("Round " + numberOfRounds + "\nEnemies coming!");
-
         isRoundDone = false;
     }
     
@@ -328,12 +328,22 @@ public class GameControlScript : MonoBehaviour
         }
         foreach(GameObject troop in troops)
             Destroy(troop);
+        /*
+        if(Random.value < 0.2f)
+        {
+            for(int i = 0; i < 10; i++)
+            {
+                SpawnTroop(new Vector3(Random.Range(40, 48), Random.Range(1, 9), 1));
+            }
+        }
+        */
         
     }
     Vector3 RandomPos()
     {
         return new Vector3(Random.Range(1, 20), Random.Range(1, 9), 1);
     }
+    
     public GameObject CreateParticle(GameObject particle, Vector3 location, float amountOfRotation, string imageName, bool isTrans = false)
     {
         GameObject particleClone = Instantiate(particle, location, Quaternion.identity);

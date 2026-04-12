@@ -1,5 +1,4 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -10,7 +9,7 @@ public class EnemyScript : MonoBehaviour
 
     public GameObject childGameObject;
 
-    public GameObject bulletPrefab, hitPrefab;
+    public GameObject bulletPrefab, hitPrefab, explosionPrefab;
 
     public SpriteRenderer spriteRenderer, childSpriteRenderer;
     public Rigidbody2D rb, childRb;
@@ -20,11 +19,14 @@ public class EnemyScript : MonoBehaviour
     public float hitCooldown = 0, shotCooldown;
     public GameObject targetMain, wayPoint = null, originArmyCamp;
     public GameObject closestTroop, closestTurret;
-    public bool isControlled, isStunned = false, whichWayDancing = false;
+    public bool isControlled, isStunned = false, whichWayDancing = false, isSlowed = false, isSilenced = false;
+
     void Start()
     {
         isControlled = false;
         isStunned = false;
+        isSlowed = false;
+        isSilenced = false;
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         gameControlScript = GameObject.Find("GameControl").
@@ -43,7 +45,6 @@ public class EnemyScript : MonoBehaviour
 
         if(transform.childCount > 0)
         {
-
             childGameObject = transform.GetChild(0).gameObject;
             childSpriteRenderer = childGameObject.GetComponent<SpriteRenderer>();
             if(name.Contains("Troop")) childSpriteRenderer.flipY = true;
@@ -291,6 +292,24 @@ public class EnemyScript : MonoBehaviour
         isStunned = false;
     }
 
+    public IEnumerator SlowDuration(float duration)
+    {
+        isSlowed = true;
+        speed /= 2;
+        
+        yield return new WaitForSeconds(duration);
+        speed *= 2;
+        isSlowed = false;
+    }
+
+    public IEnumerator SilenceDuration(float duration)
+    {
+        isSilenced = true;
+        shotCooldown = duration;
+        yield return new WaitForSeconds(duration);
+        isSilenced = false;    
+    }
+
     void OnDestroy()
     {
         if (name.Contains("CyberTruck"))
@@ -328,7 +347,7 @@ public class EnemyScript : MonoBehaviour
         {
             gameControlScript.money += 10;
             gameControlScript.moneyMadeInRound += 10;
-        }        
+        }
     }
 
 
@@ -343,6 +362,18 @@ public class EnemyScript : MonoBehaviour
                 {
                     health -= currentBuilding.damage / 2;
                     
+                    if(collision.name.Contains("Poison")) {
+                        StartCoroutine(SilenceDuration(5));
+                        StartCoroutine(SlowDuration(5));
+                    }
+                    if(collision.name.Contains("Missile"))
+                    {
+                        GameObject explosionClone = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                        explosionClone.name = "TurretExplosion";
+                        Destroy(explosionClone, 0.1f);
+                        StartCoroutine(StunDuration(1));
+                    }
+
                     Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
 
                     if (health <= 0)
@@ -366,11 +397,13 @@ public class EnemyScript : MonoBehaviour
         }
 
         if(collision.name.Contains("Bullet") && collision.name.Contains("Troop") && (name.Contains("Enemy") || name.Contains("CyberTruck")))
-        {
+        { 
             Destroy(collision.gameObject);
 
             if(name.Contains("Shield")) health -= 2;
             else health -= 5;
+
+
             
             Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
 
@@ -389,11 +422,22 @@ public class EnemyScript : MonoBehaviour
         if((collision.name.Contains("Troop") || collision.name.Contains("Enemy")) && name.Contains("CyberTruck"))
             Destroy(collision.gameObject);
         
-        if(collision.name.Contains("Explosion") && tag.Contains("Enemy"))
+        if(collision.name.Contains("Explosion")&& tag.Contains("Enemy"))
         {
-            health -= 25;
-            if(health <= 0)
-            StartCoroutine(StunDuration(5));
+            if(collision.name.Contains("Boogie"))
+            {
+                
+                StartCoroutine(StunDuration(5));
+                health -= 25;
+                if(health <= 0)
+                    Destroy(gameObject);
+            }
+            if(collision.name.Contains("Turret"))
+            {
+                health -= 200;
+                if(health <= 0)
+                    Destroy(gameObject);
+            }
         }
     }
     
