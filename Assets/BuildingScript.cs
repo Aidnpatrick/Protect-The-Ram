@@ -151,13 +151,21 @@ public class BuildingScript : MonoBehaviour
 
         Rigidbody2D brb = bulletClone.GetComponent<Rigidbody2D>();
         
-            brb.linearVelocity = bulletClone.transform.right * 20;
+        brb.linearVelocity = bulletClone.transform.right * 20;
+
         ammo--;
 
         if(name.Contains("Poison"))
-        {
             bulletClone.GetComponent<SpriteRenderer>().color = Color.green;
+
+        if(name.Contains("Missile"))
+        {
+            bulletClone.transform.localScale += new Vector3(0.1f,0.1f,0);
+            bulletClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/Missile");
+            brb.linearVelocity = bulletClone.transform.right * 40;
         }
+
+        
         Destroy(bulletClone.gameObject, 4);
     }
     void OnDestroy()
