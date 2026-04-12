@@ -23,6 +23,9 @@ public class SceneLoaderScript : MonoBehaviour
         if(tutorialCanvas != null)
             tutorialCanvas.SetActive(false);
         pageNum = 1;
+        if(tutorialImage != null)
+        
+        tutorialImage.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Tutorial" + pageNum);
     }
 
     public void ChangePageNumUp()

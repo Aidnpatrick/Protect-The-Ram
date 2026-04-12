@@ -92,10 +92,13 @@ public class GameDataBaseScript : MonoBehaviour
         new Building("Heavy Turret",4, 280,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 450, 20, 1, 5, 6);
         new Building("Poison Turret", 0.7f, 10,"Although weak in damage, it's main purpose is to slow down and weaken enemies.",2,"PoisonTurret", 250, 300, 15, 2.5f, 6, 2f);
         new Building("Machine Turret", 0.1f, 10f, "Low damage but has fast fire-rate. Shoots small ammo. (SINGLE TARGET)", 3, "MachineTUrret", 380, 350, 15, 8, 50, 7.5f);
-        new Building("Army Camp", 4f, 0, "Spawns a troop every 4 seconds.", 4, "ArmyCamp",300, 450, 0, 0, 0,0);
-        new Building("Gold Digger", 0, 0, "A building that gives passive income. Can only be placed on deposit tiles(tiles with black stuff).", 5, "GoldMine", 160, 200, 0, 0, 0, 0);
-        new Building("Boogie Mine", 0, 200, "A landmine. When an enemy steps on it, enemies within a small radius will temporarily start dancing!", 6, "BoogieMine", 90, 1, 0, 0, 0, 0);
-        new Building("Missile Turret", 0, 150,"Fires missiles that deal area damage. Very slow firate.",7,"MissileTurret",400,400,15,1.5f,1,7.5f);
+
+        new Building("Missile Turret", 0, 150,"Fires missiles that deal area damage. Very slow firate.",4,"MissileTurret",400,400,15,1.5f,1,7.5f);
+
+        new Building("Army Camp", 4f, 0, "Spawns a troop every 4 seconds.", 5, "ArmyCamp",300, 450, 0, 0, 0,0);
+        new Building("Gold Digger", 0, 0, "A building that gives passive income. Can only be placed on deposit tiles(tiles with black stuff).", 6, "GoldMine", 160, 200, 0, 0, 0, 0);
+        new Building("Boogie Mine", 0, 200, "A landmine. When an enemy steps on it, enemies within a small radius will temporarily start dancing!", 7, "BoogieMine", 90, 1, 0, 0, 0, 0);
+        
 
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
