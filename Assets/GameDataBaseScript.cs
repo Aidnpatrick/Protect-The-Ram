@@ -87,7 +87,7 @@ public class GameDataBaseScript : MonoBehaviour
     {
         Building.buildingCurrent.Clear(); // prevent duplicates
         
-        new Building("Basic Turret",1,40,"Versatile, good for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 100, 250, 15, 4, 10, 2f);
+        new Building("Basic Turret",1,40,"Versatile, good for every situation. Shoots medium ammo.  (SINGLE TARGET)", 0, "BasicTurret", 100, 200, 15, 4, 10, 2f);
 
         new Building("Heavy Turret",4, 280,"Slow but does big damage. Shoots big ammo.  (SINGLE TARGET)", 1, "HeavyTurret", 250, 450, 20, 1, 5, 6);
         new Building("Poison Turret", 0.7f, 10,"Although weak in damage, it's main purpose is to slow down and weaken enemies.",2,"PoisonTurret", 250, 300, 15, 2.5f, 6, 2f);

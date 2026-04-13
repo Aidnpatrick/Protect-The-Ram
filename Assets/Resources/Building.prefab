@@ -112,6 +112,7 @@ MonoBehaviour:
   gunPrefab: {fileID: 7027538940473513825, guid: e23943ff531be5e45a6ba8c898963465, type: 3}
   hitPrefab: {fileID: 1107376504051969498, guid: 74ef9879ba241d5459b6566ca498dfcf, type: 3}
   explosionPrefab: {fileID: 804291340626276512, guid: 7c559d63ee65119418733c1b88a2719b, type: 3}
+  damageNotificationPrefab: {fileID: 4230518412360637161, guid: 1a1293d7f2e478f4daf42f47366c2523, type: 3}
   reloadSmokeParticle: {fileID: 3083088421436362795, guid: 0b0bf69b1632cc843a80202dd0768dd9, type: 3}
   shotCooldown: 0
   reloadingCooldown: 0

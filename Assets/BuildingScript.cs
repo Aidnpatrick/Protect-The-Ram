@@ -1,11 +1,12 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class BuildingScript : MonoBehaviour
 {
     public GameControlScript gameControlScript;
     public Building building;
-    public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab, explosionPrefab;
+    public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab, explosionPrefab, damageNotificationPrefab;
     public GameObject reloadSmokeParticle;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
@@ -201,14 +202,15 @@ public class BuildingScript : MonoBehaviour
             Destroy(hitClone, 0.1f);
             Destroy(collision.gameObject);
             health -= 5;
+            gameControlScript.DamageNotification(5, transform.position);
         }
         if(collision.tag == "Enemy" && name.Contains("Boogie"))
         {
             GameObject explosionClone = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             explosionClone.name = "BoogieExplosion";
             Destroy(explosionClone, 0.35f);
-
             Destroy(gameObject);
         }
     }
+
 }

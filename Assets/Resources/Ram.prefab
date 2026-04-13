@@ -198,4 +198,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15681350c98ebfc43a767fe1a7d1aa22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  damageNotificationPrefab: {fileID: 4230518412360637161, guid: 1a1293d7f2e478f4daf42f47366c2523, type: 3}
   health: 0

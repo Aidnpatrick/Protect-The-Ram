@@ -17,12 +17,12 @@ public class GameControlScript : MonoBehaviour
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText, gameStatText;
-    public GameObject scrollSelectionContainer, informationText, controlTroopText, settingCanvasMainText, settingCanvasStatsText;
+    public GameObject scrollSelectionContainer, informationText, controlTroopText, settingCanvasMainText, settingCanvasStatsText, hitUIButton, ToggleUIButton;
 
 
     //prefab
     public GameObject selectionContainerPrefab;
-    public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab, gunPrefab;
+    public GameObject tilePrefab, enemyPrefab, ramPrefab, weedPrefab, gunPrefab, damageNotificationPrefab;
     public GameObject ReloadSmokePrefab, firingPrefab;
     public GameObject notificationPrefab;
 
@@ -36,7 +36,7 @@ public class GameControlScript : MonoBehaviour
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
     public int money = 0, numberOfRounds = 0, amountOfLand = 30, moneyMadeInRound = 0, score = 0;
-    public bool isTABactive = true, isSettingsActive = false, isGameCanvasActive = false;
+    public bool isTABactive = true, isSettingsActive = false, isGameCanvasActive = false, isDamageNotificationActive = true, isGameOver =false, isMusicActive = false;
 
 
     void Start()
@@ -51,6 +51,9 @@ public class GameControlScript : MonoBehaviour
         isRoundDone = true;
         moneyMadeInRound = 0;
         currentSelectionId = -1;
+        isGameOver = false;
+
+        isDamageNotificationActive = false;
 
         amountOfMines = 0;
 
@@ -141,7 +144,7 @@ public class GameControlScript : MonoBehaviour
 
         settingCanvas.SetActive(isSettingsActive);
 
-        if(keyboard.escapeKey.wasPressedThisFrame)
+        if(keyboard.escapeKey.wasPressedThisFrame && !isGameOver)
             isSettingsActive = !isSettingsActive;
 
         if(keyboard.lKey.wasPressedThisFrame)
@@ -255,7 +258,8 @@ public class GameControlScript : MonoBehaviour
         moneyMadeInRound = 0;
 
         float budget = 10 + numberOfRounds * 5;
-        budget *= numberOfRounds / 15.5f + 1;
+        budget *= numberOfRounds / 17f + 1;
+
 
 
         while (budget > 0)
@@ -395,9 +399,31 @@ public class GameControlScript : MonoBehaviour
         troopClone.tag = "Troop";
         troopClone.name = "Troop";
     }
+    public void ToggleDamageNotification()
+    {
+        isDamageNotificationActive = !isDamageNotificationActive;
+    }
+    public void DamageNotification(float damage, Vector3 position)
+    {
+        if(!isDamageNotificationActive) return;
+        GameObject damageNofiticationClone = Instantiate(damageNotificationPrefab, position + new Vector3(Random.Range(-0.5f,0.6f),Random.Range(-0.5f,0.6f),0), Quaternion.identity);
+        damageNofiticationClone.GetComponent<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        damageNofiticationClone.GetComponentInChildren<TMP_Text>().text = (damage).ToString();
+        Destroy(damageNofiticationClone, 0.5f);
+    }
+
+    public void ToggleMusic()
+    {
+        isMusicActive = !isMusicActive;
+    }
+    public void ToggleUI()
+    {
+        isGameCanvasActive = !isGameCanvasActive;
+    }
 
     public void GameOver()
     {
+        isGameOver = true;
         isSettingsActive = true;
         isGameCanvasActive = false;
         settingCanvasMainText.GetComponent<TMP_Text>().text = "Game Over!";

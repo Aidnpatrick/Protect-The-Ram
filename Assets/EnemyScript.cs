@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -9,7 +10,7 @@ public class EnemyScript : MonoBehaviour
 
     public GameObject childGameObject;
 
-    public GameObject bulletPrefab, hitPrefab, explosionPrefab;
+    public GameObject bulletPrefab, hitPrefab, explosionPrefab, DamageNotificationPrefab;
 
     public SpriteRenderer spriteRenderer, childSpriteRenderer;
     public Rigidbody2D rb, childRb;
@@ -317,8 +318,8 @@ public class EnemyScript : MonoBehaviour
             GameObject hitClone = Instantiate(hitPrefab, transform.position, Quaternion.identity);
             hitClone.transform.localScale += new Vector3(0.1f, 0.1f, 0);
             Destroy(hitClone, 0.1f);
-            gameControlScript.money += 10;
-            gameControlScript.moneyMadeInRound += 10;
+            gameControlScript.money += 15;
+            gameControlScript.moneyMadeInRound += 15;
             for(int i = 0; i < 5; i++)
             {
                 gameControlScript.SpawnEnemy(transform.position + new Vector3(Random.Range(-0.5f, 0.6f), Random.Range(-0.5f, 0.6f), 0));
@@ -334,8 +335,8 @@ public class EnemyScript : MonoBehaviour
         {
             if(transform.localScale.x == 0.5)
             {
-                gameControlScript.money += 9;
-                gameControlScript.moneyMadeInRound += 9;               
+                gameControlScript.money += 6;
+                gameControlScript.moneyMadeInRound += 6;               
             }
             else
             {
@@ -345,6 +346,9 @@ public class EnemyScript : MonoBehaviour
         }
         if(name.Contains("Shield"))
         {
+            GameObject hitClone = Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            hitClone.transform.localScale += new Vector3(0.1f, 0.1f, 0);
+            Destroy(hitClone, 0.1f);
             gameControlScript.money += 10;
             gameControlScript.moneyMadeInRound += 10;
         }
@@ -361,9 +365,10 @@ public class EnemyScript : MonoBehaviour
                 if(currentBuilding.name.Replace("Turret", "").Contains(collision.name.Replace("Bullet", "").Replace("Turret", "")))
                 {
                     health -= currentBuilding.damage / 2;
+                    gameControlScript.DamageNotification(currentBuilding.damage / 2, transform.position);
                     
                     if(collision.name.Contains("Poison")) {
-                        StartCoroutine(SilenceDuration(5));
+                        StartCoroutine(SilenceDuration(2.5f));
                         StartCoroutine(SlowDuration(5));
                     }
                     if(collision.name.Contains("Missile"))
@@ -388,6 +393,7 @@ public class EnemyScript : MonoBehaviour
         {
             Destroy(collision.gameObject);
             
+            gameControlScript.DamageNotification(2, transform.position);
             health -= 5;
             if(health <= 0)
                 Destroy(gameObject);
@@ -399,6 +405,7 @@ public class EnemyScript : MonoBehaviour
         if(collision.name.Contains("Bullet") && collision.name.Contains("Troop") && (name.Contains("Enemy") || name.Contains("CyberTruck")))
         { 
             Destroy(collision.gameObject);
+            gameControlScript.DamageNotification(2, transform.position);
 
             if(name.Contains("Shield")) health -= 2;
             else health -= 5;
@@ -414,6 +421,8 @@ public class EnemyScript : MonoBehaviour
         if(collision.CompareTag("Buildings") && collision.gameObject == targetMain)
         {
             collision.GetComponent<BuildingScript>().health -= 25;
+            
+            gameControlScript.DamageNotification(25, transform.position);
             Destroy(gameObject);
         }
         
@@ -427,6 +436,7 @@ public class EnemyScript : MonoBehaviour
             if(collision.name.Contains("Boogie"))
             {
                 
+                gameControlScript.DamageNotification(25, transform.position);
                 StartCoroutine(StunDuration(5));
                 health -= 25;
                 if(health <= 0)
@@ -434,6 +444,7 @@ public class EnemyScript : MonoBehaviour
             }
             if(collision.name.Contains("Turret"))
             {
+                gameControlScript.DamageNotification(200, transform.position);
                 health -= 200;
                 if(health <= 0)
                     Destroy(gameObject);

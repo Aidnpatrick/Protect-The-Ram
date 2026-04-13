@@ -111,6 +111,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 413854545547773602, guid: 5ac9924803b2d3b41a80ff8a92d80a1f, type: 3}
   hitPrefab: {fileID: 1107376504051969498, guid: 74ef9879ba241d5459b6566ca498dfcf, type: 3}
   explosionPrefab: {fileID: 804291340626276512, guid: 7c559d63ee65119418733c1b88a2719b, type: 3}
+  damageNotificationPrefab: {fileID: 4230518412360637161, guid: 1a1293d7f2e478f4daf42f47366c2523, type: 3}
   spriteRenderer: {fileID: 0}
   childSpriteRenderer: {fileID: 0}
   rb: {fileID: 0}
