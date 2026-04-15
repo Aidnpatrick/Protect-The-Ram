@@ -328,21 +328,16 @@ public class GameControlScript : MonoBehaviour
         foreach(GameObject building in turrets)
         {
             BuildingScript bs = building.GetComponent<BuildingScript>();
+            if(building.name.Contains("Healer"))
+            {
+                bs.HealTurrets();
+            }
             bs.health = Mathf.Clamp(bs.health + 35, 0, bs.building.health);
             if(bs.typeOfBuilding == 1) bs.ammo = bs.building.ammo;
         }
+
         foreach(GameObject troop in troops)
             Destroy(troop);
-        /*
-        if(Random.value < 0.2f)
-        {
-            for(int i = 0; i < 10; i++)
-            {
-                SpawnTroop(new Vector3(Random.Range(40, 48), Random.Range(1, 9), 1));
-            }
-        }
-        */
-        
     }
     Vector3 RandomPos()
     {

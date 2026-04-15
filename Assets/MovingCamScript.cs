@@ -35,7 +35,10 @@ public class MovingCamScript : MonoBehaviour
         !Input.GetMouseButtonDown(0) &&
         !Input.GetMouseButtonDown(1) &&
         !Input.GetMouseButtonDown(2))
+        {
             cameraScript.isInformationBoxActive = false;
+            cameraScript.isRangeRadiusActive = false;
+        }
 
         moveInput = moveInput.normalized;
         

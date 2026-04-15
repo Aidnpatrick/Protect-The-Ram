@@ -98,10 +98,16 @@ public class GameDataBaseScript : MonoBehaviour
         new Building("Army Camp", 4f, 0, "Spawns a troop every 4 seconds.", 5, "ArmyCamp",300, 450, 0, 0, 0,0);
         new Building("Gold Digger", 0, 0, "A building that gives passive income. Can only be placed on deposit tiles(tiles with black stuff).", 6, "GoldMine", 160, 200, 0, 0, 0, 0);
         new Building("Boogie Mine", 0, 200, "A landmine. When an enemy steps on it, enemies within a small radius will temporarily start dancing!", 7, "BoogieMine", 90, 1, 0, 0, 0, 0);
+        new Building("Healer Tower",0,30,"Heals Turrets within a 3 tile radius at the end of a round.",0,"HealerTower",200,400,3,0,0,0);
+        
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
 
         buildings.AddRange(Building.buildingCurrent);
+        for(int i = 0; i < buildings.Count; i++)
+        {
+            buildings[i].id = i;
+        }
 
 //        foreach (var t in buildings)
 //            Debug.Log($"{t.name} - Damage: {t.damage} - FireRate: {t.fireRate}");

@@ -10,12 +10,12 @@ public class CameraScript : MonoBehaviour
     public GameDataBaseScript gameDataBaseScript;
     public Camera camera;
     public Canvas gameCanvas;
-    public GameObject player, crossChair;
+    public GameObject player, crossChair, rangeRadius;
     public GameObject informationBox, selectionInformationBox;
 
     public GameObject notificationContainer;
     public GameObject notificationPrefab;
-    public bool isInformationBoxActive = false, isSelectionInformationBoxActive;
+    public bool isInformationBoxActive = false, isSelectionInformationBoxActive, isRangeRadiusActive = false;
     private Vector2 moveInput;
     public Collider2D hitMain = null;
     public bool canEdit = true, isControllingTroops = false;
@@ -29,8 +29,8 @@ public class CameraScript : MonoBehaviour
         canEdit = true;
         isControllingTroops = false;
         isInformationBoxActive = false;
-
         camera.orthographicSize = 5;
+        isRangeRadiusActive = false;
     }
     void UpdateInformationBoxSelection(Building building, Vector2 screenPosition)
     {
@@ -85,6 +85,7 @@ public class CameraScript : MonoBehaviour
 
                 hitMain = actualTarget.GetComponent<Collider2D>();
                 informationDestroyButton.gameObject.SetActive(true);
+                isRangeRadiusActive = false;
             }
             else
             {
@@ -92,6 +93,7 @@ public class CameraScript : MonoBehaviour
                 informationText.text = "Empty Ore Deposit";
                 else informationText.text = "Emtpy Tile";
                 informationDestroyButton.gameObject.SetActive(false);
+                isRangeRadiusActive = false;
             }
         }
         else
@@ -111,6 +113,9 @@ public class CameraScript : MonoBehaviour
 
                 if (actualTarget.name.Contains("Turret"))
                     informationText.text += "\n" + building.ammo + " Ammo\n";
+                rangeRadius.transform.position = hitMain.transform.position;
+                rangeRadius.transform.localScale = new Vector3(building.building.range * 2,building.building.range * 2, 1);
+                isRangeRadiusActive = true;
             }
             
         }
@@ -118,8 +123,9 @@ public class CameraScript : MonoBehaviour
         informationBox.GetComponent<RectTransform>().anchoredPosition = pos + new Vector2(200, 100);
 
         isInformationBoxActive = !isInformationBoxActive;
+        
     }
-public void MakeMoreTroops()
+    public void MakeMoreTroops()
     {
         BuildingScript bs = hitMain.GetComponent<BuildingScript>();
         bs.numOfTroops = Mathf.Clamp(bs.numOfTroops+1,0,5);
@@ -194,6 +200,7 @@ public void MakeMoreTroops()
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos);
         informationBox.SetActive(isInformationBoxActive);
+        rangeRadius.SetActive(isRangeRadiusActive && isInformationBoxActive);
         selectionInformationBox.SetActive(isSelectionInformationBoxActive);
         
 

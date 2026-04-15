@@ -1,6 +1,6 @@
+
 using System.Collections;
 using UnityEngine;
-using TMPro;
 
 public class BuildingScript : MonoBehaviour
 {
@@ -56,6 +56,10 @@ public class BuildingScript : MonoBehaviour
         {
             typeOfBuilding = 3;
         }
+        if(building.name.Contains("Healer"))
+        {
+            typeOfBuilding = 4;
+        }
     }
 
     void Update()
@@ -76,8 +80,24 @@ public class BuildingScript : MonoBehaviour
                 shotCooldown = building.fireRate;
             }
         }
+        if(typeOfBuilding == 4)
+        {
+
+        }
         if(health <= 0)
             Destroy(gameObject);
+    }
+
+    public void HealTurrets()
+    {
+        foreach(GameObject i in gameControlScript.turrets)
+        {
+            if(Vector3.Distance(i.transform.position, transform.position) < building.range && !i.name.Contains("Healer"))
+            {
+                BuildingScript bs = i.GetComponent<BuildingScript>();
+                bs.health = Mathf.Clamp(bs.health + building.damage, 0, bs.building.health);
+            }
+        }
     }
 
     void HandleShooting()
