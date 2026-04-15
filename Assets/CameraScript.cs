@@ -140,6 +140,7 @@ public void MakeMoreTroops()
     void Update()
     {
 
+        Vector2 mousePosUI = Input.mousePosition;
         Keyboard keyboard = Keyboard.current;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -163,7 +164,6 @@ public void MakeMoreTroops()
         int index = 0, mouseTouched = 0;
         foreach(Transform selectionContainerIndex in gameControlScript.selectionContainer.transform)
         {
-            Vector2 mousePosUI = Input.mousePosition;
             
             if (RectTransformUtility.RectangleContainsScreenPoint(
                 selectionContainerIndex.GetComponent<Image>().rectTransform, 
@@ -205,9 +205,7 @@ public void MakeMoreTroops()
             crossChair.SetActive(true);
         }
         else
-        {
             crossChair.SetActive(false);
-        }
 
         // children on tile
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame && !hit.transform.name.Contains("Ram"))
@@ -222,6 +220,7 @@ public void MakeMoreTroops()
             return;
         }
 
+
         if(hit == null || !hit.gameObject.name.Contains("Tile")) return;
 
         // parent on tile
@@ -233,10 +232,13 @@ public void MakeMoreTroops()
             OpenInformationBox(hit.gameObject);
             return;
         }
+        bool isInformationBoxHovered = RectTransformUtility.RectangleContainsScreenPoint(
+                informationBox.GetComponent<Image>().rectTransform, 
+                mousePosUI, 
+                gameControlScript.selectionContainer.GetComponentInParent<Canvas>().worldCamera);
 
-        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && !isInformationBoxActive && !isControllingTroops)
+        if(Input.GetMouseButtonDown(0) && hit.transform.childCount == 0 && gameControlScript.currentSelectionId != -1 && (isInformationBoxActive && !isInformationBoxHovered||!isInformationBoxActive) && !isControllingTroops)
         {
-            
             if(gameDataBaseScript.buildings[gameControlScript.currentSelectionId].name.Contains("Gold") && !hit.GetComponent<TileScript>().oreDeposit)
             {
                 gameControlScript.NotificationText("Can't place Gold Digger here! Place it on ore deposits.");
@@ -255,6 +257,15 @@ public void MakeMoreTroops()
             {
                 gameControlScript.NotificationText("Invalid funds!");
                 gameControlScript.currentSelectionId = -1;
+            }
+            if(isInformationBoxActive)
+                isInformationBoxActive = false;
+            foreach(GameObject i in gameControlScript.weeds)
+            {
+                if(i.transform.position == hit.transform.position) {
+                    Destroy(i);
+                    break;
+                }
             }
         }
 

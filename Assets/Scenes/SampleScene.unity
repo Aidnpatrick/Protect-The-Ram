@@ -1086,7 +1086,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1203869761}
-  m_Father: {fileID: 2139601552}
+  m_Father: {fileID: 589560517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1525,6 +1525,7 @@ RectTransform:
   - {fileID: 1801104373}
   - {fileID: 812257439}
   - {fileID: 2139601552}
+  - {fileID: 466685091}
   m_Father: {fileID: 1746715533}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2616,7 +2617,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 286800640}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.51779354
+  m_Size: 0.5177936
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2965,7 +2966,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 281.00003, y: -56.5}
+  m_AnchoredPosition: {x: 10, y: -56.5}
   m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &942133156
@@ -4429,6 +4430,7 @@ MonoBehaviour:
   troops: []
   tiles: []
   rams: []
+  weeds: []
   amountOfMines: 0
   depositLocations: 
   currentSelectionId: 0
@@ -4625,7 +4627,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 109.6, y: -53}
+  m_AnchoredPosition: {x: 109.60156, y: -53}
   m_SizeDelta: {x: 210, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1724234752
@@ -5529,7 +5531,6 @@ RectTransform:
   m_Children:
   - {fileID: 213526637}
   - {fileID: 1040887696}
-  - {fileID: 466685091}
   m_Father: {fileID: 589560517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class GameControlScript : MonoBehaviour
@@ -28,10 +26,9 @@ public class GameControlScript : MonoBehaviour
 
 
     //libraries
-    public GameObject[] enemies, turrets, troops, tiles, rams;
+    public GameObject[] enemies, turrets, troops, tiles, rams, weeds;
     public int amountOfMines = 0;
     public List<int> depositLocations = new List<int>();
-
 
     public int currentSelectionId = 0;
     public bool isRoundDone = true;
@@ -99,7 +96,10 @@ public class GameControlScript : MonoBehaviour
         UpdateArrays();
         GameObject ram = BuildOnTileMisc(ramPrefab, 495);
 
-        SpawnInGroups(weedPrefab, 70);
+        for(int i = 0; i < 70; i++)
+        {
+            Instantiate(weedPrefab, FindTile(Random.Range(0,500)).transform.position, Quaternion.identity);
+        }
         //StartCoroutine(e());
     }
 
@@ -240,6 +240,7 @@ public class GameControlScript : MonoBehaviour
         troops = GameObject.FindGameObjectsWithTag("Troop");
         tiles = GameObject.FindGameObjectsWithTag("Tile");
         rams = GameObject.FindGameObjectsWithTag("Ram");
+        weeds = GameObject.FindGameObjectsWithTag("Weed");
     }
     public void SpawnInGroups(GameObject child, int numberOfChilds)
     {

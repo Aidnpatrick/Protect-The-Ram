@@ -9,6 +9,7 @@ TagManager:
   - Troop
   - Tile
   - Ram
+  - Weed
   layers:
   - Default
   - TransparentFX

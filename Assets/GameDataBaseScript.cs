@@ -98,8 +98,6 @@ public class GameDataBaseScript : MonoBehaviour
         new Building("Army Camp", 4f, 0, "Spawns a troop every 4 seconds.", 5, "ArmyCamp",300, 450, 0, 0, 0,0);
         new Building("Gold Digger", 0, 0, "A building that gives passive income. Can only be placed on deposit tiles(tiles with black stuff).", 6, "GoldMine", 160, 200, 0, 0, 0, 0);
         new Building("Boogie Mine", 0, 200, "A landmine. When an enemy steps on it, enemies within a small radius will temporarily start dancing!", 7, "BoogieMine", 90, 1, 0, 0, 0, 0);
-        
-
         //new Building("Wall", 0,0, "Used for keeping enemies from advancing. Has a lot of Health.",3, "Wall", 200, 600, 0,0 ,0);
         
 
