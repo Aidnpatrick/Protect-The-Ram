@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class GameControlScript : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class GameControlScript : MonoBehaviour
     public GameObject selectionContainer, notificationContainer;
     public GameObject roundButton;
     public TMP_Text selectionText, gameStatText;
-    public GameObject scrollSelectionContainer, informationText, controlTroopText, settingCanvasMainText, settingCanvasStatsText, hitUIButton, ToggleUIButton;
+    public GameObject scrollSelectionContainer, informationText, controlTroopText, settingCanvasMainText, settingCanvasStatsText, hitUIButton, ToggleUIButton, settingsVeritcalContainer;
 
 
     //prefab
@@ -36,8 +37,13 @@ public class GameControlScript : MonoBehaviour
     public bool isTABactive = true, isSettingsActive = false, isGameCanvasActive = false, isDamageNotificationActive = true, isGameOver =false, isMusicActive = false;
 
 
+    public AudioClip clickSound, notificationSound, pop;
+    public AudioSource audioSource;
+
+
     void Start()
     {
+        volume = 100;
         score = 0;
         isSettingsActive = false;
         isTABactive = true;
@@ -56,6 +62,7 @@ public class GameControlScript : MonoBehaviour
 
         notificationContainer.SetActive(true);
         settingCanvasStatsText.SetActive(false);
+        settingsVeritcalContainer.SetActive(true);
         settingCanvasMainText.GetComponent<TMP_Text>().text = "Settings"; 
 
         NotificationText("Game Loaded!");
@@ -98,7 +105,14 @@ public class GameControlScript : MonoBehaviour
 
         for(int i = 0; i < 70; i++)
         {
-            Instantiate(weedPrefab, FindTile(Random.Range(0,500)).transform.position, Quaternion.identity);
+            GameObject weedClone = Instantiate(weedPrefab, FindTile(Random.Range(0,500)).transform.position, Quaternion.identity);
+            foreach(GameObject j in tiles)
+            {
+                if(j.GetComponent<TileScript>().oreDeposit && weedClone.transform.position == j.transform.position)
+                {
+                    Destroy(weedClone);
+                }
+            }
         }
         //StartCoroutine(e());
     }
@@ -177,6 +191,8 @@ public class GameControlScript : MonoBehaviour
     {
         if(currentSelectionId == targetId) currentSelectionId = -1;
         else currentSelectionId = targetId;
+
+        audioSource.PlayOneShot(clickSound);
     }
 
     // Update is called once per frame
@@ -310,7 +326,7 @@ public class GameControlScript : MonoBehaviour
 
     public void EndRound(bool isPassed = false)
     {
-
+        audioSource.PlayOneShot(notificationSound);
         amountOfLand = Mathf.Clamp(amountOfLand + 10, 0, 300);
         isRoundDone = true;
         NotificationText("Round Completed!\n+ $" + moneyMadeInRound);
@@ -377,6 +393,7 @@ public class GameControlScript : MonoBehaviour
     {
         GameObject notificationClone = Instantiate(notificationPrefab, notificationContainer.transform);
         notificationClone.GetComponentInChildren<TMP_Text>().text = text;
+        audioSource.PlayOneShot(pop);
         Destroy(notificationClone, 2.5f);
     }
     public 
@@ -422,9 +439,30 @@ public class GameControlScript : MonoBehaviour
         isGameOver = true;
         isSettingsActive = true;
         isGameCanvasActive = false;
-        settingCanvasMainText.GetComponent<TMP_Text>().text = "Game Over!";
+        settingCanvasMainText.GetComponent<TMP_Text>().text = "Your Ram is stolen. :(";
         settingCanvasStatsText.SetActive(true);
         settingCanvasStatsText.transform.GetChild(1).GetComponent<TMP_Text>().text = "Score: " + score + "\nRounds Defended: " + numberOfRounds;
+        settingsVeritcalContainer.SetActive(false);
     }
 
+    public AudioMixer audioMixer;
+    public float volume = 1f; // 0.0001 to 1
+
+    public void SetMasterVolumeUp()
+    {
+        volume += 0.3f;
+        volume = Mathf.Clamp(volume, 0.0001f, 1f);
+
+        audioMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+    }
+
+    public void SetMasterVolumeDown()
+    {
+        volume -= 0.3f;
+        volume = Mathf.Clamp(volume, 0.0001f, 1f);
+
+        audioMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+    }
 }
+
+

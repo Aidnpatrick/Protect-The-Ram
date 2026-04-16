@@ -8,6 +8,8 @@ public class BuildingScript : MonoBehaviour
     public Building building;
     public GameObject bulletPrefab, troopPrefab, gunPrefab, hitPrefab, explosionPrefab, damageNotificationPrefab;
     public GameObject reloadSmokeParticle;
+    public AudioSource audioSource;
+    public AudioClip rocketShootSound, turretShootSound, explosion;
 
     public float shotCooldown = 0, reloadingCooldown = 0;
 
@@ -120,6 +122,7 @@ public class BuildingScript : MonoBehaviour
         }
         if(shotCooldown <= 0)
         {
+
             Shoot();
             shotCooldown = building.fireRate;
         }
@@ -144,7 +147,7 @@ public class BuildingScript : MonoBehaviour
 
     void Shoot()
     {
-        
+
         GameObject target = gameControlScript.FindNearestObject(
             gameControlScript.enemies,
             building.range,
@@ -154,6 +157,14 @@ public class BuildingScript : MonoBehaviour
 
         if(target == null) return;
 
+        if(name.Contains("Missile"))
+        {
+            audioSource.PlayOneShot(rocketShootSound);
+        }
+        else
+        {
+            audioSource.PlayOneShot(turretShootSound);
+        }
 
         GameObject bulletClone = Instantiate(
             bulletPrefab,
@@ -183,7 +194,7 @@ public class BuildingScript : MonoBehaviour
         {
             bulletClone.transform.localScale += new Vector3(0.1f,0.1f,0);
             bulletClone.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Images/Missile");
-            brb.linearVelocity = bulletClone.transform.right * 40;
+            brb.linearVelocity = bulletClone.transform.right * 30;
         }
 
         
@@ -227,6 +238,7 @@ public class BuildingScript : MonoBehaviour
         if(collision.tag == "Enemy" && name.Contains("Boogie"))
         {
             GameObject explosionClone = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            audioSource.PlayOneShot(explosion);
             explosionClone.name = "BoogieExplosion";
             Destroy(explosionClone, 0.35f);
             Destroy(gameObject);

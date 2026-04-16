@@ -1,5 +1,4 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class EnemyScript : MonoBehaviour
@@ -21,6 +20,8 @@ public class EnemyScript : MonoBehaviour
     public GameObject targetMain, wayPoint = null, originArmyCamp;
     public GameObject closestTroop, closestTurret;
     public bool isControlled, isStunned = false, whichWayDancing = false, isSlowed = false, isSilenced = false;
+    public AudioClip enemySound, troopSound, explosion;
+    public AudioSource audioSource;
 
     void Start()
     {
@@ -55,7 +56,7 @@ public class EnemyScript : MonoBehaviour
         {
             wayPoint = Instantiate(Resources.Load<GameObject>("WayPoint"), transform.position + new Vector3(50,0,0), Quaternion.identity);
             speed = 3.7f;
-            health = 400;
+            health = 350;
             GetComponent<CircleCollider2D>().radius = 1.25f;
             Destroy(transform.GetChild(0).gameObject);
         }
@@ -149,6 +150,11 @@ public class EnemyScript : MonoBehaviour
                 if(shotCooldown <= 0 && !isStunned)
                 {
                     Shoot();
+                    if(name.Contains("Enemy"))
+                        audioSource.PlayOneShot(enemySound);
+                    else if(name.Contains("Troop"))
+                        audioSource.PlayOneShot(troopSound);
+
                     if(name.Contains("Big"))
                     {
                         for(int i = 0; i < 5; i++)
@@ -335,13 +341,13 @@ public class EnemyScript : MonoBehaviour
         {
             if(transform.localScale.x == 0.5)
             {
-                gameControlScript.money += 6;
-                gameControlScript.moneyMadeInRound += 6;               
+                gameControlScript.money += 9;
+                gameControlScript.moneyMadeInRound += 9;               
             }
             else
             {
-                gameControlScript.money += 1;
-                gameControlScript.moneyMadeInRound += 1;     
+                gameControlScript.money += 2;
+                gameControlScript.moneyMadeInRound += 2;     
             }
         }
         if(name.Contains("Shield"))
@@ -368,7 +374,7 @@ public class EnemyScript : MonoBehaviour
                     gameControlScript.DamageNotification(currentBuilding.damage / 2, transform.position);
                     
                     if(collision.name.Contains("Poison")) {
-                        StartCoroutine(SilenceDuration(2.5f));
+                        StartCoroutine(SilenceDuration(0.5f));
                         StartCoroutine(SlowDuration(5));
                     }
                     if(collision.name.Contains("Missile"))
@@ -377,6 +383,7 @@ public class EnemyScript : MonoBehaviour
                         explosionClone.name = "TurretExplosion";
                         Destroy(explosionClone, 0.1f);
                         StartCoroutine(StunDuration(1));
+                        audioSource.PlayOneShot(explosion);
                     }
 
                     Destroy(Instantiate(hitPrefab, transform.position, Quaternion.identity), 0.1f);
@@ -445,7 +452,7 @@ public class EnemyScript : MonoBehaviour
             if(collision.name.Contains("Turret"))
             {
                 gameControlScript.DamageNotification(200, transform.position);
-                health -= 200;
+                health -= 50;
                 if(health <= 0)
                     Destroy(gameObject);
             }

@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using Unity.VisualScripting;
 
 public class CameraScript : MonoBehaviour
 {
@@ -24,6 +23,8 @@ public class CameraScript : MonoBehaviour
     public GameObject buildingPrefab;
 
     public GameObject targetMain;
+    public AudioClip placeDown, clickSound, deleteSound;
+    public AudioSource audioSource;
     void Start()
     {
         canEdit = true;
@@ -139,13 +140,17 @@ public class CameraScript : MonoBehaviour
             {
                 gameControlScript.money += gameDataBaseScript.FindBuildingClassById(hitMain.GetComponent<BuildingScript>().building.id).cost / 2;
             }
+            audioSource.PlayOneShot(deleteSound);
             Destroy(hitMain.gameObject);
         }
         isInformationBoxActive = false;
     }
     void Update()
     {
-
+        if(gameControlScript.isSettingsActive)
+        {
+            return;
+        }
         Vector2 mousePosUI = Input.mousePosition;
         Keyboard keyboard = Keyboard.current;
 
@@ -217,12 +222,14 @@ public class CameraScript : MonoBehaviour
         // children on tile
         if(hit != null && hit.transform.parent != null && hit.transform.parent.name.Contains("Tile") && keyboard.xKey.wasPressedThisFrame && !hit.transform.name.Contains("Ram"))
         {
+            audioSource.PlayOneShot(deleteSound);
             Destroy(hit.gameObject);
             return;
         }
 
         if (Input.GetMouseButtonDown(1) && hit != null && hit.transform.parent != null)
         {
+            audioSource.PlayOneShot(clickSound);
             OpenInformationBox(hit.gameObject);
             return;
         }
@@ -236,6 +243,7 @@ public class CameraScript : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
+            audioSource.PlayOneShot(clickSound);
             OpenInformationBox(hit.gameObject);
             return;
         }
@@ -253,6 +261,7 @@ public class CameraScript : MonoBehaviour
             }
             if(500 - gameControlScript.amountOfLand < tileScript.id && gameControlScript.money >= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost)
             {
+                audioSource.PlayOneShot(placeDown);
                 gameControlScript.money -= gameDataBaseScript.FindBuildingClassById(gameControlScript.currentSelectionId).cost;
                 BuildingBuildOnTile(gameControlScript.currentSelectionId, hit.gameObject);
                 gameControlScript.currentSelectionId = -1;
@@ -277,7 +286,11 @@ public class CameraScript : MonoBehaviour
         }
 
         if(hit.transform.childCount > 0 && keyboard.xKey.wasPressedThisFrame && !hit.transform.GetChild(0).name.Contains("Ram"))
+        {
+            
+            audioSource.PlayOneShot(deleteSound);
             Destroy(hit.transform.GetChild(0).gameObject);
+        }
         
         if(isControllingTroops && Input.GetMouseButtonDown(0))
         {
